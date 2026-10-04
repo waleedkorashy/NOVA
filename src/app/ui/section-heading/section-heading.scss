@@ -1,0 +1,27 @@
+// Section heading — the shared three-part opening.
+//
+// Deliberately almost empty. The eyebrow, the lede, the display face and the
+// spacing rhythm are all already in the global layer, and tokens inherit for
+// free, so this file owns only the composition: a start-aligned stack, and the
+// measure that stops a fluid display size from running to six words a line.
+
+:host {
+  display: block;
+}
+
+.heading {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-sm);
+}
+
+// The global eyebrow carries its own bottom margin; the grid gap owns the
+// rhythm here instead, so the two do not compound.
+.heading__eyebrow {
+  margin-block-end: 0;
+}
+
+// The size is fluid (see --text-h2); the line length is not.
+.heading__title {
+  max-inline-size: 22ch;
+}

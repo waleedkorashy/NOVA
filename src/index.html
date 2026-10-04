@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>NOVA — Premium Furniture &amp; Lifestyle</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Description is written for a human, not a crawler: one benefit-led sentence, no keyword stuffing. -->
+    <meta
+      name="description"
+      content="NOVA designs premium furniture and lifestyle pieces for calm, considered interiors. Explore the collection, crafted from thoughtful materials and made to last."
+    />
+    <meta name="theme-color" content="#f3f0ea" />
+    <link rel="canonical" href="https://nova.example.com/" />
+
+    <!-- Open Graph / social. The share image is a designed 1200x630 asset
+         (M9); this placeholder points at the site identity until then. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="NOVA" />
+    <meta property="og:title" content="NOVA — Premium Furniture &amp; Lifestyle" />
+    <meta
+      property="og:description"
+      content="Premium furniture and lifestyle pieces for calm, considered interiors. Crafted from thoughtful materials and made to last."
+    />
+    <meta property="og:url" content="https://nova.example.com/" />
+    <meta property="og:image" content="https://nova.example.com/og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Site icon.
+         The NOVA monogram: a geometric "N" drawn as an SVG path, so it needs no
+         font at render time and cannot fall back to a system serif. The SVG is
+         listed first because browsers pick the first format they support; the
+         multi-size ICO is the fallback for anything that does not do SVG
+         favicons. Both are copied verbatim into the build root from `public/`,
+         and the relative paths resolve against <base href="/">. -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48" href="favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+
+    <!-- Preload the two approved OFL variable fonts. Two files, self-hosted,
+         no external requests. `crossorigin` is required for font preloads even
+         same-origin, or the fetch is issued twice. -->
+    <link
+      rel="preload"
+      href="assets/fonts/Newsreader-Variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="assets/fonts/Archivo-Variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>

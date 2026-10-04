@@ -1,0 +1,118 @@
+// =============================================================================
+// NOVA — motion
+//
+// Purposeful motion only. Everything here animates compositor-friendly
+// properties (transform, opacity) so it never triggers layout.
+//
+// Scroll reveal is PROGRESSIVE ENHANCEMENT: the base state is visible, and the
+// `reveal` directive (shared/directives/reveal.ts, M8) only *adds* the
+// animation. If JavaScript fails, IntersectionObserver never fires, or the user
+// prefers reduced motion, content is still fully visible and readable. A
+// hidden-by-default reveal would be a content-invisible failure mode.
+//
+// No animation library.
+//
+// Global layer — not subject to the 8 kB anyComponentStyle budget.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Reduced motion — the authoritative override.
+//
+// This comes last so it wins on specificity ties. It collapses durations
+// rather than removing rules, which keeps specificity stable and avoids
+// transitionend/animationend never firing for JS that listens to them.
+// -----------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  // A revealed element must never be left mid-transform when motion is off.
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Reveal
+//
+// Applied by the `reveal` directive. Elements start visible; the directive adds
+// the hidden state only when it has confirmed it can animate them back.
+// -----------------------------------------------------------------------------
+.reveal {
+  transition:
+    opacity var(--duration-reveal) var(--ease-out),
+    transform var(--duration-reveal) var(--ease-out);
+}
+
+.reveal:not(.is-revealed) {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+}
+
+.reveal.is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+// Slightly different treatment for images — a soft scale-up from full bleed
+// reads more like a photograph settling into place than a slide-in.
+.reveal--image:not(.is-revealed) {
+  opacity: 0;
+  transform: scale(1.04);
+}
+
+// Staggered siblings, capped so a long list never feels slow.
+.reveal[data-reveal-index] {
+  transition-delay: calc(var(--stagger) * var(--reveal-index, 0));
+}
+
+// -----------------------------------------------------------------------------
+// Image reveal — a curtain wipe for editorial figures.
+//
+// Uses clip-path (compositor-friendly on modern engines) with a scale fallback.
+// -----------------------------------------------------------------------------
+@keyframes nova-curtain {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.curtain {
+  animation: nova-curtain var(--duration-slow) var(--ease-out) both;
+}
+
+// -----------------------------------------------------------------------------
+// Header / mobile menu transitions.
+//
+// The menu panel is driven by a signal in `site-header` (M1). CSS only handles
+// the visual transition; state lives in the component.
+// -----------------------------------------------------------------------------
+@keyframes nova-menu-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -0.5rem, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.menu-enter {
+  animation: nova-menu-in var(--duration-base) var(--ease-out) both;
+}

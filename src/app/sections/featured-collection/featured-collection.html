@@ -1,0 +1,56 @@
+<!--
+  Featured Collection. `aria-labelledby` points at the heading inside
+  <ui-section-heading>, so the region announces its own name in the landmark
+  list.
+
+  The list keeps `role="list"` alongside `.list-reset`: removing the bullets
+  with CSS alone makes Safari and VoiceOver drop the list semantics entirely, so
+  the role is what keeps "list, 6 items" announced.
+
+  The grid is deliberately uneven: column spans vary by position, and two of the
+  three rows are bottom-aligned so the leftover space falls above a card where it
+  reads as air. At 64rem row 2 also stops one column short of the right edge.
+  That hole is the composition, not a gap — see featured-collection.scss.
+
+  `.container--editorial` narrows the measure on large desktops so the imagery
+  reads as a portrait object rather than a full-width tile. It is a cap, so
+  nothing below 1024px moves. See `--container-editorial`.
+
+  Every card frame is 4 / 5, matching the delivered photography exactly. The
+  asymmetry is carried entirely by the column spans; see `aspects` in
+  featured-collection.ts for why the ratio variety was dropped.
+-->
+<section id="collection" class="section collection" aria-labelledby="collection-title">
+  <div class="container container--editorial">
+    <!--
+      `[id]`, not `id`. A static attribute would land on the <ui-section-heading>
+      host and leave the h2 unlabelled, so `aria-labelledby` would resolve to a
+      wrapper instead of the element that actually provides the name. Binding it
+      puts the id on the heading, where the label has to point.
+    -->
+    <ui-section-heading
+      eyebrow="The Collection"
+      title="Six pieces, made to be kept."
+      lede="Proportion first, decoration last. Every piece is drawn to sit with the others and to age into the room rather than out of it."
+      [id]="'collection-title'"
+    />
+
+    <ul class="list-reset collection__list" role="list">
+      @for (product of products(); track product.id; let i = $index) {
+        <li class="collection__item">
+          <ui-product-card [product]="product" [aspect]="aspects[i % aspects.length]" />
+        </li>
+      } @empty {
+        <!--
+          Reachable only if the data source returns an empty list. Rendering a
+          bare heading with nothing under it would look like a broken page, so
+          the empty state is stated plainly instead. No invented products are
+          substituted to fill the gap.
+        -->
+        <li class="collection__empty">
+          <p>No pieces are available to view at the moment.</p>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

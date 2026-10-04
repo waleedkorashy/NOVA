@@ -1,0 +1,114 @@
+// Product card — a genuinely reusable primitive (Featured Collection + Product
+// Showcase), so it is written as a slot for a product and nothing else. It knows
+// nothing about the grid it sits in, and the grid does not reach inside it.
+//
+// Deliberately NOT a rounded, shadowed "card":
+//   * no border-radius — the brand uses square corners (`_components.scss` sets
+//     `border-radius: 0` on every button for the same reason)
+//   * no box-shadow  — depth is carried by whitespace, not lift
+//   * no coloured chips — materials read as one specification line
+// The only "container" affordance is a hairline rule above the price, which is
+// the editorial device already used by `.rule` globally.
+//
+// The image frame reuses the global `.figure` class, which already supplies
+// `overflow: hidden`, the placeholder surface and `object-fit: cover`. That is
+// why this file is short: the only genuinely local rules left are the ratio the
+// section hands over and the interaction response.
+
+:host {
+  display: block;
+}
+
+// Composition input: the section decides the ratio, the card honours it. The
+// `4 / 5` default lives on the `aspect` input, so a reuse site that passes
+// nothing still gets a correct portrait crop.
+.card__figure {
+  aspect-ratio: var(--card-aspect);
+}
+
+.card__body {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2xs);
+  padding-block-start: var(--space-md);
+}
+
+// The global eyebrow carries its own margin; the grid gap owns the rhythm.
+.card__category {
+  margin-block-end: 0;
+  font-size: var(--text-eyebrow);
+}
+
+.card__name {
+  font-size: var(--text-h3);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.01em;
+}
+
+// The name is the link, so it must not look like body text — but underlining
+// every product name would fight the display type. Accent colour on interaction
+// carries the affordance instead, which is the pattern `.prose a` already uses.
+.card__name a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--duration-base) var(--ease-out);
+}
+
+.card__materials,
+.card__summary {
+  color: var(--color-text-soft);
+  max-inline-size: var(--measure-narrow);
+}
+
+.card__materials {
+  font-size: var(--text-small);
+  letter-spacing: 0.01em;
+  color: var(--color-text-muted);
+}
+
+.card__price {
+  margin-block-start: var(--space-2xs);
+  padding-block-start: var(--space-xs);
+
+  inline-size: 100%;
+  border-block-start: 1px solid var(--color-rule);
+
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+  font-size: var(--text-body-lg);
+  color: var(--color-text);
+}
+
+// -----------------------------------------------------------------------------
+// Interaction
+//
+// Hover AND `:focus-within` produce the same response, so a keyboard user gets
+// the same confirmation as a pointer user. Pointer-only hover styling would make
+// the card look inert to keyboard navigation, which is a WCAG 2.4.7 failure.
+//
+// The scale is 1.04 — the same restrained range as the global `.figure--zoom`
+// treatment, not a stronger effect. `transform` only, so no layout is triggered,
+// and the global reduced-motion override in `_motion.scss` collapses the
+// transition rather than removing the state.
+// -----------------------------------------------------------------------------
+.card__image {
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+@media (hover: hover) {
+  :host(:hover) .card__name a {
+    color: var(--color-accent);
+  }
+
+  :host(:hover) .card__image {
+    transform: scale(1.04);
+  }
+}
+
+:host(:focus-within) .card__name a {
+  color: var(--color-accent);
+}
+
+:host(:focus-within) .card__image {
+  transform: scale(1.04);
+}

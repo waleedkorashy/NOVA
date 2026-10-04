@@ -1,0 +1,67 @@
+<!--
+  Brand Story. `aria-labelledby` points at the h2 inside <ui-section-heading>, so
+  the region announces its own name in the landmark list.
+
+  OWNS `id="about"`, replacing the M1 shell placeholder exactly as M3 did for
+  `#collection` and M5 did for `#journal`. From here the four approved nav anchors
+  resolve to: #collection FeaturedCollection, #journal Editorial, #about this
+  section, #contact the remaining M7 placeholder.
+
+  No photograph, unlike Editorial. See the class comment in brand-story.ts for why
+  a new image could not be added with honest attribution and why reusing an
+  approved one would duplicate a picture already on the page. The section is
+  built from typography instead, which is also what keeps it from reading as a
+  second Editorial.
+
+  No invented history. NOVA is a self-initiated design study, so the copy argues
+  the design philosophy and stops there: no founding date, no location, no people,
+  no facility, no customers, no certification, no sustainability figure. The
+  component has no inputs at all, so there is no data field any such claim could
+  be rendered from.
+
+  The three statements are a `<ul>`, not an `<ol>`: they are parallel, and their
+  order is not an argument. `role="list"` sits alongside `.list-reset` because
+  stripping markers with CSS alone makes Safari and VoiceOver drop the list
+  semantics entirely.
+-->
+<section id="about" class="section story" aria-labelledby="about-title">
+  <div class="container">
+    <ui-section-heading
+      eyebrow="The Idea"
+      title="The room is the real subject."
+      lede="Furniture drawn in service of the space it stands in. The piece is the last decision, not the first."
+      [id]="'about-title'"
+    />
+
+    <div class="story__spread">
+      <div class="prose story__prose">
+        <p>
+          Most furniture is designed to be looked at. This is designed to be lived around, which
+          means the drawing starts with what is left over: the clearance beneath a seat, the wall a
+          chair backs onto, the width of a walkway kept open. A piece is finished when the space
+          around it still works, and that is a harder thing to draw than the piece itself.
+        </p>
+
+        <p>
+          Everyday life is the only brief worth taking seriously. A sofa has to survive a Tuesday as
+          well as a photograph. A surface has to take a cup ring, a scratch and a decade of daylight
+          without turning into either a museum exhibit or a disposal problem. Anything that cannot
+          do that has not been designed so much as styled.
+        </p>
+
+        <p>
+          The name is the argument. A nova is the point at which a quantity of light suddenly
+          becomes enough to see by — something that was always there, and only now is legible. A
+          good room does the same thing. Nothing moves. A little of the right thing arrives in the
+          right place, and the whole space reads more clearly than it did before.
+        </p>
+      </div>
+
+      <ul class="list-reset story__creed" role="list">
+        <li class="story__creed-item">Quiet over impressive.</li>
+        <li class="story__creed-item">Nothing added for effect.</li>
+        <li class="story__creed-item">One collection, drawn as a set.</li>
+      </ul>
+    </div>
+  </div>
+</section>

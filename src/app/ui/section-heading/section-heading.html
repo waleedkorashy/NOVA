@@ -1,0 +1,24 @@
+<!--
+  Eyebrow + title + optional lede. Optional parts are omitted rather than
+  rendered empty, so a section without a lede has no stray <p> for a screen
+  reader to announce.
+
+  The title carries the optional `id` because it is the element that provides
+  the section's accessible name — a host section points `aria-labelledby` here.
+-->
+<div class="heading">
+  @if (eyebrow(); as label) {
+    <span class="eyebrow heading__eyebrow">{{ label }}</span>
+  }
+
+  <!--
+    `attr.id`, not `id`: a property binding to `undefined` writes the literal
+    string "undefined" onto the element, which would put a junk id in the DOM on
+    every section that does not supply one. An attribute binding removes it.
+  -->
+  <h2 class="heading__title" [attr.id]="id()">{{ title() }}</h2>
+
+  @if (lede(); as text) {
+    <p class="lede heading__lede">{{ text }}</p>
+  }
+</div>

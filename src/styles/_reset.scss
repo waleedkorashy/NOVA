@@ -1,0 +1,115 @@
+// =============================================================================
+// NOVA — reset
+//
+// A small, opinionated reset. Deliberately minimal: it removes what breaks
+// layout or accessibility and nothing more. Editorial design depends on
+// predictable box sizing and a real baseline, so those are handled here.
+//
+// Global layer — not subject to the 8 kB anyComponentStyle budget.
+// =============================================================================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  // Anchor navigation for #collection, #about, #journal, #contact.
+  // Reduced-motion users get instant jumps instead (see _motion.scss).
+  scroll-behavior: smooth;
+  // Never use 100vw anywhere: it ignores the scrollbar and causes horizontal
+  // overflow. Container widths are always percentage-based.
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  // Belt-and-braces against a stray wide child causing sideways scroll on
+  // mobile. This is a safety net, never a substitute for correct sizing.
+  overflow-x: hidden;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  font-weight: var(--weight-regular);
+  // Modern variable-font rendering; prevents faux-bold synthesis.
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  // Editorial headings are set tight; long words must not overflow narrow
+  // viewports.
+  text-wrap: balance;
+}
+
+ul[role='list'],
+ol[role='list'],
+.list-reset {
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--color-rule);
+}
+
+// Respect the OS "reduce motion" setting globally. _motion.scss extends this
+// with the animated properties.
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

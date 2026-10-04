@@ -1,0 +1,283 @@
+// Product Showcase — the page's second moment of drama (plan §7).
+//
+// One dominant product, asymmetric two-column, sticky frame beside a scrolling
+// detail column on desktop; stacked below 48rem. Deliberately NOT a card grid:
+// Featured Collection already introduces all six pieces, so repeating
+// `ui-product-card` here would make the page say the same thing twice. See
+// product-showcase.ts for why the card is not reused as a second site.
+//
+// Everything reusable is global: `.container`, `.section`, `.figure`,
+// `.list-reset`, the fluid type scale, the spacing tokens, the eyebrow. This file
+// owns only the grid geometry, the sticky mechanism and the index rows.
+//
+// THE MEASURE, and why the frame is narrower than its own column
+//
+// At >=64rem the frame is `span 5` of 12 capped at 78% of that column, which
+// lands near 368x460 at 1280 and 415x519 at 1440 — about 5% larger than the
+// Editorial photograph above it (349x436 and 393x491). That step up in presence is
+// the "second moment"; anything larger starts dominating the viewport again, which
+// is exactly what M5 had to be walked back from.
+//
+// The 78% was 84% until the M6 visual review, which judged the frame "slightly too
+// large relative to the rest of the section" and asked for 5–10% off. The whole
+// scale moved together rather than only the desktop cap, so the frame keeps the
+// same relationship to its track at every breakpoint instead of shrinking only
+// where it was noticed.
+//
+// The 22% left inside the column is deliberate air. This grid sets a real
+// `column-gap`, but the frame sits at the start of its own track, so the gap does
+// not separate it from anything on its left. The percentage is what puts daylight
+// between the photograph and the text beside it without a hard width.
+//
+// Base and 48rem need no rem ceiling below 48rem: a full-measure frame on a 480px
+// phone would be 440x550, so the cap there is a `min()` against a rem ceiling AND a
+// 94% share, and from 48rem the `span 3` track governs with 94% of it.
+//
+// No `transform: scale()` anywhere. Scaling a 4:5 frame would scale the rendered
+// bitmap inside its own box, leaving the reserved space and the gap beside it
+// unchanged — the photograph would look smaller while the layout stayed exactly as
+// oversized. Every reduction here is real layout width.
+
+// THE LEADING EDGE IS TIGHTER THAN THE TRAILING ONE
+//
+// `.section` pads both edges by the full `--section-y`, and the section above this
+// one does the same, so the space a reader crosses between Editorial's last line and
+// the `IN DETAIL` eyebrow is the SUM of two full section paddings: 330px at 1440,
+// which read as a dead zone rather than as breathing room. Editorial has already
+// given this transition its air in its own trailing padding, so this side only
+// needs to contribute a share of it.
+//
+// `padding-block-start` alone, deliberately: the trailing edge keeps the full
+// `--section-y`, because the space between this section and Brand Story is not
+// under review and both sides are text-led sections that need the air.
+//
+// Scoped as `.section.showcase` rather than `.showcase` because `.section` is a
+// single class too — same specificity, so the outcome would depend on stylesheet
+// injection order. This wins on specificity instead of on luck.
+.section.showcase {
+  padding-block-start: calc(var(--section-y) * 0.35);
+}
+
+:host {
+  display: block;
+}
+
+.showcase__spread {
+  display: grid;
+  row-gap: var(--space-xl);
+  margin-block-start: var(--space-2xl);
+}
+
+// <figure> carries a UA margin; this section sets its own rhythm instead.
+.showcase__media {
+  margin: 0;
+  min-width: 0;
+}
+
+// 4:5, which is the delivered ratio of every product photograph exactly, so this
+// frame reserves real space and never crops. The global `.figure` supplies the
+// overflow box, the placeholder surface and `object-fit`.
+.showcase__frame {
+  aspect-ratio: 4 / 5;
+  max-inline-size: min(94%, 22.5rem);
+}
+
+// `--space-xl` (3rem) rather than `--space-2xl` (4rem): the M6 visual review asked
+// for the range to sit closer to the piece it belongs to.
+.showcase__detail {
+  display: grid;
+  align-content: start;
+  gap: var(--space-xl);
+  min-width: 0;
+}
+
+.showcase__piece {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2xs);
+}
+
+// The global eyebrow carries its own bottom margin; the grid gap owns the rhythm.
+.showcase__category {
+  margin-block-end: 0;
+  font-size: var(--text-eyebrow);
+}
+
+// Same size as a card name, deliberately. This is still an h3 under the section's
+// h2, and inflating it would put a second heading tier in the section and undo the
+// hierarchy the outline already establishes. The dominance in this section comes
+// from the photograph, not from type.
+.showcase__name {
+  font-size: var(--text-h3);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.01em;
+}
+
+.showcase__summary,
+.showcase__materials {
+  color: var(--color-text-soft);
+  max-inline-size: var(--measure-narrow);
+}
+
+.showcase__materials {
+  font-size: var(--text-small);
+  letter-spacing: 0.01em;
+  color: var(--color-text-muted);
+}
+
+.showcase__price {
+  margin-block-start: var(--space-sm);
+  padding-block-start: var(--space-xs);
+
+  inline-size: 100%;
+  border-block-start: 1px solid var(--color-rule);
+
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+  font-size: var(--text-body-lg);
+  color: var(--color-text);
+}
+
+// The index is a ruled list, not a card stack. A hairline above each row is the
+// same editorial device `.numbered` and `.rule` already use, so this reads as a
+// specification table rather than as five more products.
+.showcase__range-title {
+  margin-block-end: var(--space-2xs);
+}
+
+.showcase__index {
+  display: grid;
+}
+
+// Padding trimmed from `--space-xs` (0.75rem) in the M6 visual review, which read
+// the rows as loosely spaced. The larger win was the price placement below — this
+// value alone moved a row only 114px -> 106px.
+.showcase__index-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3xs) var(--space-sm);
+  align-items: baseline;
+  padding-block: var(--space-2xs);
+  border-block-start: 1px solid var(--color-rule);
+}
+
+// The category sits under the name and spans both columns, so a narrow row never
+// has to break "NOVA Frame Sideboard" and "Sideboard" onto one line.
+.showcase__index-category {
+  grid-column: 1 / -1;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+// THE PRICE MUST BE PLACED, NOT LEFT TO AUTO-FLOW
+//
+// This is the actual cause of the "too much vertical spacing between entries" the
+// M6 visual review reported, and it is a bug rather than a spacing choice.
+//
+// Source order is name, category, price. The category spans `1 / -1`, and in
+// row-sparse auto-placement a full-width item that cannot start at column 1 of the
+// current row is pushed to the NEXT row — so the category took row 2 and the price
+// was auto-placed into row 3 on its own line. The browser agreed:
+// `grid-template-rows` computed to `28.05px 24.75px 28.05px`, three tracks, for a
+// two-line entry. Five rows came to 570px, taller than the 559px photograph they
+// were meant to sit beside.
+//
+// Naming both coordinates puts the price back on the name's line, which is what
+// `grid-template-columns: minmax(0, 1fr) auto` and `text-align: end` were always
+// written for. Row height falls to ~74px and the list to ~370px.
+//
+// `grid-row: 1` is required as well as `grid-column: 2`: the price is the THIRD
+// child, so fixing only the column would leave it auto-flowing to the next row.
+.showcase__index-price {
+  grid-row: 1;
+  grid-column: 2;
+
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums tabular-nums;
+  text-align: end;
+  color: var(--color-text);
+}
+
+.showcase__empty {
+  margin-block-start: var(--space-2xl);
+  color: var(--color-text-soft);
+}
+
+// -----------------------------------------------------------------------------
+// >= 48rem (768px): two columns.
+//
+// The plan calls for sticky on DESKTOP only, so this breakpoint introduces the
+// two-column arrangement WITHOUT it. `span 3` of 6 at 94% puts the frame at
+// 317x397 on a 768px window — a full-measure frame here would be 707x884, which
+// dominates the viewport, so the track placement is doing real work rather than
+// decorating.
+// -----------------------------------------------------------------------------
+@media (width >= 48rem) {
+  .showcase__spread {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+    row-gap: 0;
+  }
+
+  .showcase__media {
+    grid-column: 1 / span 3;
+  }
+
+  .showcase__detail {
+    grid-column: 4 / span 3;
+  }
+
+  // The track now governs; the base rem ceiling would cap it unnecessarily. 94%
+  // leaves the daylight between the photograph and the detail column.
+  .showcase__frame {
+    max-inline-size: 94%;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// >= 64rem (1024px): the desktop composition, plus the sticky frame.
+//
+// `align-self: start` is load-bearing, not decorative. A grid item that stretches
+// to its row's height has no travel left, so `position: sticky` on it silently
+// does nothing. The row here is as tall as the detail column (671px — a 202px
+// piece plus a 380px index), which leaves 211px of travel against a 460px frame.
+//
+// The top offset is the sticky header plus one spacing step, so a pinned frame
+// never tucks under the bar. At 1280x720 the frame is 368x460, and 460 + 128
+// still clears a 720px window.
+//
+// Known trap, measured not assumed: `position: sticky` on this element currently
+// computes as `sticky` and is reported as sticky, but the frame does NOT pin —
+// `html` and `body` both carry `overflow-x: hidden` (src/styles/_reset.scss), which
+// makes `body` a scroll container, so the sticky element resolves against a
+// scrollport that never scrolls. Forcing `body { overflow: visible }` makes the
+// frame hold at exactly 128px. That is a global-reset issue affecting every sticky
+// element on the page, not an M6 one, so it is left alone here and tracked as a
+// separate item rather than fixed inside a section.
+//
+// `position: sticky` is not animation, so `prefers-reduced-motion` does not apply
+// to it and needs no override here.
+// -----------------------------------------------------------------------------
+@media (width >= 64rem) {
+  .showcase__spread {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .showcase__media {
+    grid-column: 1 / span 5;
+    position: sticky;
+    top: calc(var(--header-offset) + var(--space-xl));
+    align-self: start;
+  }
+
+  // Column 6 is left empty: the deliberate hole, matching the Collection grid and
+  // the Editorial spread. It is why the two columns read as composed rather than
+  // as a table.
+  .showcase__detail {
+    grid-column: 7 / span 5;
+  }
+
+  .showcase__frame {
+    max-inline-size: 78%;
+  }
+}

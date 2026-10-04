@@ -1,0 +1,27 @@
+<!--
+  NOVA monogram favicon.
+
+  The "N" is drawn as a PATH, not a <text> element. That is deliberate and load
+  bearing: an SVG favicon is rendered by the browser in its own icon context
+  where web fonts are NOT reliably available, so a <text> version would silently
+  fall back to whatever generic serif the OS happens to ship and the mark would
+  change shape from machine to machine. A path has no such dependency and costs
+  no bytes. It also cannot inherit the Newsreader that the header wordmark uses,
+  which is the point — the tab icon has to be legible at 16px, not beautiful.
+
+  Drawn on a 32x32 grid, filling 3..29 on both axes (81% of the box). Geometry:
+    - two 7.5-unit stems at x 3-10.5 and x 21.5-29
+    - a diagonal band of 11 units vertical thickness, which works out to ~6.5
+      perpendicular against 7.5-unit stems
+  The diagonal is deliberately a little lighter than the stems, which is how a
+  real typeface draws an N. The whole mark is heavy and fills the box edge to
+  edge because at 16px a lightly-weighted or inset mark closes up and turns to
+  mush.
+
+  Ink #17150f on bone #f3f0ea is the same 16:1 pairing the page uses for text,
+  and it reads on both light and dark browser chrome.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="NOVA">
+  <rect width="32" height="32" rx="4" fill="#17150f" />
+  <path d="M3 29V3h7.5L21.5 18V3H29v26h-7.5L10.5 14v15Z" fill="#f3f0ea" />
+</svg>

@@ -1,0 +1,39 @@
+<!--
+  Final CTA. A labelled region so it appears in the landmark list by name, and
+  the owner of `#contact` now that the M1 placeholder is gone — the third
+  anchor hand-off of this kind, after M3's #collection and M6's #about.
+
+  Copy states a design position only. No customer counts, no offers, no
+  conversion language, no invented business facts, no contact channel
+  (AGENTS.md, "No fabricated social proof" and "No invented contact details").
+
+  `id` sits on the <section> because it is the navigation target; the `h2` is
+  what `aria-labelledby` points at, so the region is named by its own title
+  rather than by the anchor it happens to own.
+-->
+<section id="contact" class="section section--invert cta" aria-labelledby="contact-title">
+  <div class="container">
+    <!--
+      Centred, and only three pieces deep: eyebrow, title, one sentence, one
+      action. The `.lede` and `.btn` classes are global, so this costs no extra
+      component CSS for the type or the button.
+    -->
+    <div class="cta__inner">
+      <span class="eyebrow cta__eyebrow">Closing note</span>
+
+      <h2 id="contact-title" class="cta__title">Start with one piece.</h2>
+
+      <p class="lede cta__lede">
+        A collection is an argument, not a list. Start with the piece that keeps you in the room.
+      </p>
+
+      <!--
+        One action, and it is the page's established primary target rather than
+        an invented destination. `.btn--invert` is the outlined variant, which is
+        what reads correctly on the inverted band — a filled `.btn--primary` would
+        be dark-on-dark here.
+      -->
+      <a class="btn btn--invert cta__action" href="#collection">Explore the Collection</a>
+    </div>
+  </div>
+</section>

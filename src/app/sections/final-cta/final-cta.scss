@@ -1,0 +1,63 @@
+// NOVA — final-cta
+//
+// Plan §7's closing statement: "restrained, centred, single action. Echoes hero
+// without duplicating it." This file owns only the centring and the measure —
+// the band, the type scale, the eyebrow, the lede and the button are all
+// already in the global layer, so none of them are re-paid for here.
+//
+// SCALE IS THE POINT OF THIS FILE
+//
+// This project has already corrected an oversized-image problem twice, so the
+// section is deliberately kept off the page's size ceiling:
+//   · padding is 0.6 × --section-y rather than the full token (the same ratio
+//     as the global `.section--tight`), because the content is only three lines
+//     deep and full padding would make a short section occupy a tall band;
+//   · the title is a bare `h2`, so it inherits --text-h2 and stays a clear step
+//     below the Hero's --text-display. It never reaches display size;
+//   · the measure is capped so the sentence breaks on its own terms.
+//
+// `.section--invert` supplies the band and flips every foreground token, and
+// `.btn--invert` is the outlined button that reads correctly on it. Both were
+// already in the global layer and both were previously unused — they exist for
+// exactly this section.
+
+:host {
+  display: block;
+}
+
+.cta {
+  // Deliberately under the full token: a closing beat, not a second hero.
+  padding-block: calc(var(--section-y) * 0.6);
+}
+
+.cta__inner {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-sm);
+  text-align: center;
+}
+
+// The global eyebrow carries its own bottom margin; the grid gap owns the
+// rhythm here instead, so the two do not compound.
+.cta__eyebrow {
+  margin-block-end: 0;
+}
+
+// The size is fluid (--text-h2); the line length is not.
+.cta__title {
+  max-inline-size: 24ch;
+  text-wrap: balance;
+}
+
+// Global `.lede` caps the measure at --measure-narrow; centring it needs the
+// auto margins, because the cap is what stops a fluid size running long.
+.cta__lede {
+  margin-inline: auto;
+  text-wrap: pretty;
+}
+
+// One step clear of the grid gap, so the action reads as a separate beat
+// rather than as a fourth line of the same stack.
+.cta__action {
+  margin-block-start: var(--space-sm);
+}

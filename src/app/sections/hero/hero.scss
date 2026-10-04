@@ -1,0 +1,116 @@
+// Hero — deliberately thin. Everything reusable (container, type, buttons, spacing
+// rhythm, motion) comes from the global layer; only this composition's geometry
+// lives here, to stay well under the 4 kB component-style warning.
+//
+// Layout: stacked and gutter-contained below 64rem; asymmetric split at and above
+// it. Both share one rule — the media NEVER bleeds. It sits inside the same
+// container as the rest of the page, so the page has a single left and right
+// margin rather than a special case at the top.
+//
+// WHY THE BLEED WAS REMOVED
+//
+// This used to break the right-hand gutter out to the viewport edge, and pin the
+// frame to a 4:5 portrait. Measured at 100% zoom, that produced:
+//
+//   1280x720   image 708 x 885  -- 123% of the viewport HEIGHT, 318px past the fold
+//   1440x900   image 802 x 1002 -- 111% of the viewport HEIGHT, 255px past the fold
+//
+// A photograph taller than the screen is not an editorial choice, it is a
+// rendering bug that happens to look deliberate. Two things caused it, and both
+// are fixed at the source rather than papered over with a margin:
+//
+// 1. A 4:5 portrait frame on a 3:2 LANDSCAPE photograph. The frame was three
+//    times taller than the photo's own proportions, so `cover` had to throw away
+//    roughly half the width to fill it — the image was huge AND badly cropped.
+//    Pinning the frame to 3:2 means `cover` now crops NOTHING, which is strictly
+//    better for the approved asset and removes the distortion guard entirely.
+// 2. Nothing tied the media to viewport HEIGHT. It was sized purely from width,
+//    so any short window overflowed. `--hero-media-max` does that now.
+
+:host {
+  display: block;
+  padding-block: var(--space-2xl) var(--section-y);
+}
+
+.hero__inner {
+  width: min(100% - (2 * var(--gutter)), var(--container-max));
+  margin-inline: auto;
+}
+
+.hero__text {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-md);
+}
+
+// The global eyebrow carries its own margin; the grid gap owns the rhythm here.
+.hero__text > .eyebrow {
+  margin-block-end: 0;
+}
+
+// Editorial measure control: the display size is fluid, the line length is not.
+// 20ch rather than 16ch — with the smaller --text-display the headline now sets
+// on two lines instead of four, so this is no longer the binding constraint.
+h1 {
+  max-inline-size: 20ch;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+  margin-block-start: var(--space-sm);
+}
+
+.hero__figure {
+  margin-block: 0;
+  margin-inline: 0;
+}
+
+// The frame is pinned to the delivered 3:2 art direction — the photograph's OWN
+// ratio, so `cover` is a safety net rather than the thing doing the work.
+//
+// The width cap is derived from --hero-media-max rather than being a number of
+// its own, because `max-block-size` alone would NOT preserve the ratio: with
+// `inline-size: 100%` the width is already resolved, so clamping the height just
+// squashes the box and re-introduces exactly the distortion this avoids. Capping
+// the width at (max * 3 / 2) instead lets the ratio derive the height, so the
+// ceiling is reached with the image still exactly 3:2.
+.hero__image {
+  display: block;
+  aspect-ratio: 3 / 2;
+  inline-size: min(100%, calc(var(--hero-media-max) * 3 / 2));
+  block-size: auto;
+  max-block-size: var(--hero-media-max);
+  object-fit: cover;
+}
+
+// Base: stacked, and the media sits inside the gutters like everything else.
+@media (width < 64rem) {
+  .hero__figure {
+    margin-block-start: var(--space-2xl);
+  }
+}
+
+// 64rem (1024px): the asymmetric desktop composition.
+@media (width >= 64rem) {
+  :host {
+    padding-block-start: var(--space-3xl);
+    // --section-y bottom is ~134px at 1280, which combined with the media used
+    // to push the whole Hero past a 720px fold. --space-3xl keeps a deliberate
+    // 96px of air below the CTAs while letting the section close inside a short
+    // window. The whitespace is preserved; it is just no longer spent below the
+    // fold where nobody sees it as part of the Hero.
+    padding-block-end: var(--space-3xl);
+  }
+
+  .hero__inner {
+    display: grid;
+    // 0.9 / 1.1 rather than the old 0.82 / 1.18. The image still leads, but the
+    // text column is wide enough for the headline to set on two lines instead of
+    // four, which is most of why the Hero used to be taller than the viewport.
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    column-gap: var(--space-2xl);
+  }
+}

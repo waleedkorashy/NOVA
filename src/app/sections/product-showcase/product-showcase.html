@@ -1,0 +1,127 @@
+<!--
+  Product Showcase. `aria-labelledby` points at the h2 inside <ui-section-heading>,
+  so the region announces its own name in the landmark list.
+
+  No `id` on the <section>, deliberately. The four approved nav anchors are
+  #collection (Collection), #journal (Editorial), #about (Brand Story) and
+  #contact (M7), and this section is none of them. See brand-values.html for the
+  same reasoning.
+
+  NOT a card grid. Featured Collection already introduces all six pieces, so
+  repeating `ui-product-card` here would say the same thing twice. One piece is
+  presented properly; the other five are a ruled text index. See the class comment
+  in product-showcase.ts for why `product-card` is deliberately not reused.
+
+  The index items are plain text, not links. The cards above already send every
+  product name to #contact; five more focusable rows all resolving to the same
+  anchor would be five tab stops for no new destination.
+-->
+<section class="section showcase" aria-labelledby="showcase-title">
+  <div class="container">
+    <ui-section-heading
+      eyebrow="In Detail"
+      title="One piece, at reading distance."
+      lede="The collection is six objects. This is the closest look at any of them — proportion, material and the measurements that decide how a room holds together."
+      [id]="'showcase-title'"
+    />
+
+    @if (featured(); as piece) {
+      <div class="showcase__spread">
+        <!--
+          The sticky half. `position: sticky` and `align-self: start` are both
+          applied from the stylesheet at >=64rem only; below that this is an
+          ordinary block above the detail column.
+        -->
+        <figure class="showcase__media">
+          <!--
+            Alt text comes from the data, so it describes what is visible in the
+            photograph and never claims the furniture is a NOVA piece — these are
+            licensed third-party images. See images/ATTRIBUTION.md. product-card
+            asserts the same rule for the cards above.
+          -->
+          <span class="figure showcase__frame">
+            <img
+              class="showcase__image"
+              [ngSrc]="piece.image.src"
+              [alt]="piece.image.alt"
+              [width]="piece.image.width"
+              [height]="piece.image.height"
+              [priority]="piece.image.priority ?? false"
+            />
+          </span>
+        </figure>
+
+        <!--
+          The scrolling half. Its height is what gives the sticky frame somewhere
+          to travel, so the range index below is load-bearing for the effect, not
+          decoration.
+        -->
+        <div class="showcase__detail">
+          <div class="showcase__piece">
+            <span class="eyebrow showcase__category">{{ piece.category }}</span>
+
+            <h3 class="showcase__name">{{ piece.name }}</h3>
+
+            <p class="showcase__summary">{{ piece.summary }}</p>
+
+            <!--
+              Materials as one specification line, not tags or pills, for the same
+              reason product-card does it: a comma-separated line reads as
+              specification, three rounded chips read as filter UI.
+            -->
+            @if (piece.materials; as materials) {
+              <p class="showcase__materials">{{ materials.join(' · ') }}</p>
+            }
+
+            <!--
+              Price rendered from the number and the currency, never from a
+              preformatted string, so a future API can change either one without
+              touching this template. Zero decimals for the same reason as the
+              cards: a made-to-order catalogue does not quote cents.
+            -->
+            <p class="showcase__price">
+              {{ piece.price | currency: piece.currency : 'symbol' : '1.0-0' }}
+            </p>
+          </div>
+
+          @if (rest().length) {
+            <div class="showcase__range">
+              <!--
+                h3, a sibling of the piece name rather than a child of it. Both
+                are subsections of this section; nothing here belongs underneath
+                the product. Nothing in this section goes below h3.
+              -->
+              <h3 class="showcase__range-title">The rest of the collection</h3>
+
+              <!--
+                `role="list"` alongside `.list-reset`: stripping markers with CSS
+                alone makes Safari and VoiceOver drop the list semantics entirely.
+              -->
+              <ul class="list-reset showcase__index" role="list">
+                @for (item of rest(); track item.id) {
+                  <li class="showcase__index-row">
+                    <span class="showcase__index-name">{{ item.name }}</span>
+                    <span class="showcase__index-category">{{ item.category }}</span>
+                    <span class="showcase__index-price">
+                      {{ item.price | currency: item.currency : 'symbol' : '1.0-0' }}
+                    </span>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      </div>
+    } @else {
+      <!--
+        Reachable only if the data source returns an empty catalogue. Stated
+        plainly rather than rendering a heading over nothing; no products are
+        invented to fill it.
+
+        `@else`, not `@empty`: `@empty` only follows an `@for` block, and the
+        condition here is an `@if` on a single nullable piece.
+      -->
+      <p class="showcase__empty">No pieces are available to view at the moment.</p>
+    }
+  </div>
+</section>

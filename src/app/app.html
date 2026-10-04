@@ -1,0 +1,100 @@
+<!-- Skip link: first focusable element on the page, per the a11y strategy. -->
+<a class="skip-link" href="#main">Skip to content</a>
+
+<site-header [(menuOpen)]="menuOpen" />
+
+<!-- `inert` while the mobile panel is open, so the page behind it cannot be
+     reached by keyboard, screen reader, or pointer. Removed entirely otherwise. -->
+<main id="main" [attr.inert]="menuOpen() ? '' : null">
+  <app-hero />
+
+  <!--
+    ==========================================================================
+    ANCHOR PLACEHOLDERS — M1 SHELL SCAFFOLDING. NOW FULLY RETIRED.
+    ==========================================================================
+    M1 created four bare <section class="shell-anchor"> elements so the four
+    approved navigation anchors (#collection, #about, #journal, #contact) had
+    real, focusable targets to verify fragment navigation and scroll-margin-top
+    against. Each was replaced, milestone by milestone, by the real section that
+    owns its anchor:
+
+      #collection  ->  <app-featured-collection>   M3
+      #journal     ->  <app-editorial>             M5
+      #about       ->  <app-brand-story>           M6
+      #contact     ->  <app-final-cta>             M7
+
+    M7 was the last one, so there are now ZERO `.shell-anchor` elements in the
+    document and every approved anchor resolves to a real, labelled section.
+    app.spec.ts asserts that count is zero, so a placeholder cannot reappear.
+    ==========================================================================
+  -->
+  <!--
+    M3. The section owns `id="collection"` itself, so the M1 placeholder is gone.
+    `PRODUCTS` is handed in here rather than imported by the section — this is the
+    single line that changes when the catalogue moves to an API
+    (`[products]="products$"` with an HttpClient call). See shared/data/products.ts.
+  -->
+  <app-featured-collection [products]="products" />
+
+  <!--
+    M4. Brand Values and Craft & Process, in the plan's §7 order.
+
+    Neither section declares an `id`, and that is deliberate rather than an
+    oversight: the four approved nav anchors are owned by #collection (M3, above),
+    #journal (M5 editorial), #about (M6 brand-story) and #contact (M7 final-cta).
+    Giving these two sections an anchor of their own would either duplicate a
+    target or invite a fifth nav entry, neither of which is in scope.
+  -->
+  <app-brand-values />
+  <app-craft-process />
+
+  <!--
+    M5. Editorial / Lifestyle — the section owns `id="journal"` itself, so the M1
+    placeholder is gone, exactly as M3 did for `#collection`.
+
+    Position is load-bearing. Plan §7 orders the page Hero → Collection → Values →
+    Craft → Editorial → Showcase → Story, but the M1 placeholders were laid out
+    #about, #journal, #contact in DOM order. Wiring Editorial where its own
+    placeholder sat would therefore have put the brand story *above* it. Moving
+    Editorial up here, directly after Craft, is what makes the current DOM match
+    the plan; the two remaining placeholders keep their relative order for M6/M7.
+
+    This also makes the Hero's secondary CTA real: `hero.html` has pointed
+    "View Lookbook" at `#journal` since M2, and until now that anchor only landed
+    on a placeholder paragraph.
+  -->
+  <app-editorial />
+
+  <!--
+    M6. Product Showcase and Brand Story, completing plan §7's order with only the
+    Final CTA still to come.
+
+    Both are handed the same `products` binding as the Collection above rather than
+    importing `PRODUCTS` themselves, so the future data-source swap stays a change
+    to this file plus one provider. The Showcase derives its dominant piece from
+    `products()[0]` and its index from the rest — there is no second product data
+    source anywhere in M6.
+
+    Brand Story owns `id="about"`, so its M1 placeholder is gone and
+    `#about` resolves to the real section, exactly as M3 did for `#collection` and
+    M5 did for `#journal`.
+  -->
+  <app-product-showcase [products]="products" />
+  <app-brand-story />
+
+  <!--
+    M7. The Final CTA, and with it the last of the four approved nav anchors.
+
+    The M1 `#contact` placeholder that sat here is deleted, so plan §7's order is
+    now complete: Hero → Collection → Values → Craft → Editorial → Showcase →
+    Story → CTA, and every one of #collection, #about, #journal and #contact
+    resolves to a real section rather than to scaffold. There are no
+    `.shell-anchor` elements left in the document.
+
+    The section owns `id="contact"` itself, exactly as M3 did for `#collection`
+    and M6 did for `#about`, so the id is declared in one place only.
+  -->
+  <app-final-cta />
+</main>
+
+<site-footer [attr.inert]="menuOpen() ? '' : null" />

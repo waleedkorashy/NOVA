@@ -1,0 +1,61 @@
+<!--
+  Craft & Process. `.section--invert` supplies both the background and the
+  foreground, so every descendant inherits usable colour without this template
+  restating a single colour value.
+
+  No `id` on the <section>: the four approved nav anchors are already spoken for
+  (#collection M3, #about M6, #journal M5, #contact M7) and this section is
+  deliberately not addressable. See brand-values.html for the same reasoning.
+
+  The `<ol>` is ordered because these three steps are a sequence — material,
+  then joint, then finish — and that order is the content. `role="list"` sits
+  alongside `.list-reset` because removing the markers with CSS alone makes
+  Safari and VoiceOver drop the list semantics entirely.
+
+  The step numerals are `aria-hidden`: the `<ol>` already announces position, so
+  exposing them too would state the order twice per step.
+
+  Unlike Brand Values, the desktop spans here are even (4 / 4 / 3 is reserved for
+  the principles section). A process is a sequence and uneven steps would read as
+  misalignment rather than rhythm; the editorial weight on this band comes from
+  the inverted surface and the oversized numerals instead.
+-->
+<section class="section section--invert craft" aria-labelledby="craft-title">
+  <div class="container">
+    <ui-section-heading
+      eyebrow="Craft &amp; Process"
+      title="How a piece gets made."
+      lede="Method, in the order it happens: which material, how it is joined, and how it is finished."
+      [id]="'craft-title'"
+    />
+
+    <ol class="list-reset craft__list" role="list">
+      <li class="numbered craft__step">
+        <span class="craft__index" aria-hidden="true">01</span>
+        <h3 class="numbered__title">Material first.</h3>
+        <p class="numbered__body">
+          Solid oak where a frame has to carry, ash where a curve has to stay true, walnut only
+          where a face is visible. Grain sets the dimensions, and the drawing is cut to the board.
+        </p>
+      </li>
+
+      <li class="numbered craft__step">
+        <span class="craft__index" aria-hidden="true">02</span>
+        <h3 class="numbered__title">Joinery, not hardware.</h3>
+        <p class="numbered__body">
+          Wedged tenons and through-mortises do the carrying, and are left visible from the side. A
+          frame should come apart and go back together without a mark.
+        </p>
+      </li>
+
+      <li class="numbered craft__step">
+        <span class="craft__index" aria-hidden="true">03</span>
+        <h3 class="numbered__title">A finish that can be repaired.</h3>
+        <p class="numbered__body">
+          Hard-wax oil worked in and left to cure between coats. Matte, so the timber still reads as
+          timber and a damaged surface can be treated locally instead of sprayed again.
+        </p>
+      </li>
+    </ol>
+  </div>
+</section>

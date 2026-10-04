@@ -1,0 +1,262 @@
+// NOVA — site-header
+//
+// Component-local only. Everything shared (tokens, .btn, focus ring,
+// reduced-motion) comes from the global layer and is referenced, not restated —
+// see AGENTS.md on why @use-ing a partial here would bill its compiled bytes to
+// this file against the 4 kB working limit.
+
+// Inline-nav breakpoint. MUST equal INLINE_NAV_MIN_WIDTH_REM in
+// site-header.ts — the TS uses it to dismiss the panel, the SCSS decides where
+// the panel becomes the inline bar. Keep the two in step.
+//
+// Measured in a real browser at 768px: the inline row needs ~705px (4 links at
+// 2rem gaps + the 267px CTA) and the wordmark ~104px, so ~809px minimum before
+// gutters. 48rem (768px) therefore overflowed the container; 60rem is the first
+// width with real slack. Below it, tablets use the collapsed panel.
+$bp-nav: 60rem;
+
+:host {
+  // `display: block` on purpose. As a grid container the panel (an abspos child)
+  // would resolve its insets against its grid area rather than this box, which
+  // mis-sized it; `.bar` handles the horizontal layout instead.
+  display: block;
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 50;
+
+  width: min(100% - (2 * var(--gutter)), var(--container-max));
+  margin-inline: auto;
+
+  // Translucent paper with a backdrop blur: content scrolling underneath stays
+  // readable as it passes. Solid paper where backdrop-filter is unsupported,
+  // because a transparent bar over text cannot guarantee contrast.
+  background-color: color-mix(in srgb, var(--nova-paper) 88%, transparent);
+  border-block-end: 1px solid var(--color-rule);
+
+  @supports (backdrop-filter: blur(1px)) {
+    backdrop-filter: blur(10px);
+  }
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+
+  // Stable bar height: the 44px trigger must not add height, and the inline CTA
+  // (51px) must not change the bar height between breakpoints.
+  min-block-size: 3.5rem;
+}
+
+// -----------------------------------------------------------------------------
+// Wordmark — the NOVA identity
+//
+// The mark is purely typographic: Newsreader (already the display face, already
+// preloaded) set in letterspaced caps. No icon, no SVG, no second font — the
+// identity is the word itself, which is what keeps it Scandinavian-restrained.
+//
+// Two details that are easy to miss and cheap to get wrong:
+//
+// 1. `letter-spacing` adds a trailing gap AFTER the final glyph, which sits
+//    outside the ink of the A and pushes the wordmark's optical centre left in
+//    the flex bar. The negative margin cancels exactly that one space.
+// 2. The size is fluid but deliberately bounded. `$bp-nav` assumes a ~104px
+//    wordmark when it decided the inline row fits from 60rem; growing unbounded
+//    would silently reintroduce the overflow that breakpoint was set to avoid.
+//    So the upper clamp term holds the mark at or under the assumed width.
+// -----------------------------------------------------------------------------
+.wordmark {
+  flex: none;
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+
+  // 20px at 360, 24px from ~880 up. Capped at 24px to respect the 104px budget.
+  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.2em;
+  margin-inline-end: -0.2em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--color-text);
+
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.wordmark:hover {
+  color: var(--color-accent);
+}
+
+.wordmark__text {
+  display: block;
+}
+
+// -----------------------------------------------------------------------------
+// Trigger — narrow widths only
+// -----------------------------------------------------------------------------
+.menu-trigger {
+  display: grid;
+  place-items: center;
+
+  // 44x44 minimum target (WCAG 2.2), and it never drives the bar height.
+  inline-size: 44px;
+  block-size: 44px;
+  flex: none;
+
+  color: var(--color-text);
+}
+
+.menu-trigger__bars {
+  display: grid;
+  gap: 5px;
+  inline-size: 22px;
+
+  > span {
+    display: block;
+    block-size: 1.5px;
+    background-color: currentcolor;
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+}
+
+// The icon becomes a cross while the panel is open — a second, non-colour cue
+// for the state, so it never relies on the accent alone.
+:host(.is-open) .menu-trigger__bars > span:first-child {
+  transform: translateY(3.25px) rotate(45deg);
+}
+
+:host(.is-open) .menu-trigger__bars > span:last-child {
+  transform: translateY(-3.25px) rotate(-45deg);
+}
+
+// -----------------------------------------------------------------------------
+// Nav — the panel when narrow, the inline row from $bp-nav
+// -----------------------------------------------------------------------------
+.nav {
+  // Closed state is `display: none`, not `visibility: hidden` or `opacity: 0`:
+  // those keep the links in the accessibility tree and still tabbable, which
+  // would strand a keyboard user on invisible links while the trigger reads
+  // aria-expanded="false".
+  display: none;
+}
+
+:host(.is-open) .nav {
+  position: absolute;
+  inset-block-start: 100%;
+
+  // Negative insets widen the panel by exactly the two gutters the host is
+  // inset by, so it spans the viewport. `inline-size: auto` lets the insets
+  // determine the width — no `100% + gutter` arithmetic to get wrong.
+  inset-inline: calc(-1 * var(--gutter));
+  inline-size: auto;
+
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+
+  padding: var(--space-md) var(--gutter) var(--space-lg);
+
+  background-color: var(--nova-paper);
+  border-block-end: 1px solid var(--color-rule);
+  box-shadow: 0 1.25rem 2rem rgb(20 18 14 / 0.08);
+
+  // Only when opening. The nav is always in the DOM, so an unconditional
+  // animation would also fire on first paint.
+  animation: var(--duration-base) nova-menu-in var(--ease-out) both;
+}
+
+.nav__list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav__list li {
+  border-block-end: 1px solid var(--color-rule);
+}
+
+.nav__link {
+  display: inline-flex;
+  align-items: center;
+
+  // Full-width rows: a far better touch target than a text-sized link.
+  inline-size: 100%;
+  min-block-size: 52px;
+
+  font-size: 1rem;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-text);
+
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.nav__link:hover {
+  color: var(--color-accent);
+}
+
+.nav__cta {
+  inline-size: 100%;
+}
+
+// -----------------------------------------------------------------------------
+// Inline nav — from $bp-nav. Selector is repeated with `:host(.is-open)` so a
+// stale open state (e.g. JS matchMedia unavailable) cannot leave panel styling
+// applied at desktop widths: same specificity, later in the file.
+// -----------------------------------------------------------------------------
+@media (min-width: $bp-nav) {
+  .menu-trigger {
+    display: none;
+  }
+
+  .nav,
+  :host(.is-open) .nav {
+    position: static;
+    inset-inline: auto;
+    inline-size: auto;
+    z-index: auto;
+
+    // Required: the base rule is `display: none`, and a later media block does
+    // not un-set a property it never mentions.
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-md);
+
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    animation: none;
+  }
+
+  .nav__list {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .nav__list li {
+    border: 0;
+  }
+
+  .nav__link {
+    inline-size: auto;
+
+    // 44px tall touch target while staying visually compact.
+    min-block-size: 44px;
+
+    font-size: var(--text-small);
+  }
+
+  .nav__cta {
+    inline-size: auto;
+  }
+}

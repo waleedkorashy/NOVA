@@ -1,0 +1,217 @@
+// =============================================================================
+// NOVA — design tokens
+//
+// Single source of truth for colour, typography, spacing, layout and motion.
+// Everything is emitted as a CSS custom property on :root so component styles
+// can consume the system at ZERO compiled cost (see AGENTS.md, "How
+// anyComponentStyle is actually measured"). Tokens are inherited at runtime —
+// they never need to be re-declared inside a component stylesheet.
+//
+// This partial lives in the GLOBAL layer, so its compiled size is measured
+// against the `initial` budget (500 kB warn / 1 MB error), NOT the 8 kB
+// `anyComponentStyle` budget. That headroom is the entire reason the NOVA
+// styling strategy works. Do not move these into a component.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Brand palette
+//
+// Warm near-monochrome. One restrained clay accent. No gradients, no shadows.
+// Contrast ratios below are COMPUTED (WCAG 2.2 relative-luminance formula), not
+// estimates, and MUST still be re-confirmed with AXE during M9.
+// -----------------------------------------------------------------------------
+:root {
+  // Surfaces
+  --nova-paper: #f3f0ea; // primary warm bone background
+  --nova-paper-alt: #eae5dc; // secondary surface, alternating bands
+  --nova-night: #14120e; // inverted section background
+
+  // Ink
+  --nova-ink: #17150f; // primary text                16.05:1 on paper (AAA)
+  --nova-ink-soft: #4a453d; // body / secondary text     8.36:1 on paper (AAA)
+  --nova-muted: #6b6459; // meta, captions, eyebrows   5.14:1 on paper (AA)
+
+  // INK IS NOT USABLE ON --nova-night (1.02:1). Any section using
+  // --nova-night must pair with a *-invert foreground token.
+
+  // Lines
+  --nova-line: #d8d1c5; // hairline rules, borders (decorative only)
+  --nova-line-night: #3a352c; // hairlines on --nova-night
+
+  // Accent — restrained, used intentionally for hierarchy, emphasis, interaction
+  // and brand identity. Deliberately darkened from #a85f3c (~4.2:1, fails AA at
+  // body size) to clear WCAG AA. Never used decoratively or excessively.
+  --nova-clay: #8f4e2e; //  5.60:1 on paper (AA)
+  --nova-clay-night: #d9a37f; //  8.46:1 on --nova-night (AAA)
+
+  // Foreground on inverted surfaces
+  --nova-bone: #f3f0ea; // text on --nova-night    16.45:1 (AAA)
+  --nova-bone-dim: #b8b2a6; // secondary on night   8.87:1 (AAA)
+  --nova-bone-strong: #fffdf9; // text on --nova-clay  6.27:1 (AA)
+
+  // All contrast ratios above are computed values, verified against WCAG 2.2
+  // relative-luminance formula. Every text pair clears AA; most clear AAA.
+  // Re-verify with AXE during M9 accessibility verification.
+
+  // Semantic aliases — components reference these, not the raw palette, so the
+  // palette can be re-themed without touching component styles.
+  --color-bg: var(--nova-paper);
+  --color-bg-alt: var(--nova-paper-alt);
+  --color-bg-invert: var(--nova-night);
+  --color-text: var(--nova-ink);
+  --color-text-soft: var(--nova-ink-soft);
+  --color-text-muted: var(--nova-muted);
+  --color-text-invert: var(--nova-bone);
+  --color-text-invert-soft: var(--nova-bone-dim);
+  --color-text-on-accent: var(--nova-bone-strong);
+  --color-accent: var(--nova-clay);
+  --color-accent-invert: var(--nova-clay-night);
+  --color-rule: var(--nova-line);
+  --color-rule-invert: var(--nova-line-night);
+
+  // Focus ring — must stay >= 3:1 against every adjacent colour.
+  --color-focus: var(--nova-clay);
+}
+
+// -----------------------------------------------------------------------------
+// Typography
+//
+// Two self-hosted variable families, both SIL OFL 1.1:
+//   Newsreader (display, opsz + wght) — editorial serif for headings and display
+//   Archivo    (UI, wght)             — neutral grotesque for body, nav, labels
+//
+// Both use `font-display: swap` and self-hosted woff2 declared in
+// _typography.scss. No external font requests.
+// -----------------------------------------------------------------------------
+:root {
+  --font-display: 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-ui:
+    'Archivo', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial,
+    sans-serif;
+
+  // Fluid type scale. clamp() means responsive typography is written ONCE here
+  // rather than repeated in every component's media queries — a central reason
+  // component stylesheets can stay tiny.
+  //
+  // --text-display feeds `h1` and nothing else, and the Hero owns the only h1 on
+  // the page, so this scale is effectively the Hero headline and nothing more.
+  //
+  // It was 5.2vw / 6.5rem, which reached 100px at 1440 — nearly 1.6x the 64px
+  // section headings, so the headline out-shouted the entire page and, in a
+  // column under 460px, wrapped to four lines and made the Hero taller than a
+  // 720px-tall window. 3.6vw / 4.75rem lands at 76px, which restores a sane 1.2x
+  // step down to --text-h2 and drops the headline to two lines. The headline got
+  // smaller AND its column got wider, which is a proportion fix, not a shrink.
+  --text-display: clamp(2.5rem, 1.5rem + 3.6vw, 4.75rem);
+  --text-h2: clamp(2.25rem, 1.5rem + 3.2vw, 4rem);
+  --text-h3: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  // Pull-quote (Editorial). Deliberately stepped BETWEEN --text-h2 and --text-h3,
+  // not above h2: a pull-quote at heading scale would compete with the section
+  // title it sits under, and reusing --text-h3 would make it indistinguishable
+  // from a card name. 36px at 1024+ against a 64px h2 and 17px body keeps the
+  // three tiers legible. Lives here, in the global layer, so sections consume it
+  // with zero compiled component-style cost (AGENTS.md on `anyComponentStyle`).
+  --text-pullquote: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
+  --text-body-lg: clamp(1.125rem, 1rem + 0.5vw, 1.3125rem);
+  --text-body: 1.0625rem;
+  --text-small: 0.9375rem;
+  --text-eyebrow: 0.75rem;
+
+  // Line heights
+  --leading-display: 0.95; // tight editorial headline leading
+  --leading-heading: 1.05;
+  --leading-body: 1.65;
+  --leading-tight: 1.2;
+
+  // Letter spacing. Display type needs negative tracking at large sizes; small
+  // uppercase type needs positive tracking to stay legible.
+  --tracking-display: -0.02em;
+  --tracking-eyebrow: 0.14em;
+
+  // Readable measure — long-form copy never exceeds this.
+  --measure: 65ch;
+  --measure-narrow: 48ch;
+
+  // Weights available on the variable axes
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+}
+
+// -----------------------------------------------------------------------------
+// Spacing — 8px base with a 4px half-step
+// -----------------------------------------------------------------------------
+:root {
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+  --space-4xl: 8rem;
+  --space-5xl: 12rem;
+
+  // Section rhythm — generous whitespace is the brand.
+  --section-y: clamp(4rem, 2rem + 8vw, 10rem);
+
+  // Ceiling for the Hero photograph's height.
+  //
+  // The Hero frame is pinned to the photograph's own 3:2, so its width is derived
+  // from this (see hero.scss) and the two can never disagree. The 56vh term is
+  // the important half: it ties the image to the VIEWPORT HEIGHT, which is what
+  // makes the Hero fit a short window like 1280x720 instead of sizing purely to
+  // width and then overflowing the fold. The 260px floor keeps it substantial on
+  // a short landscape phone; the 560px ceiling stops it ballooning on a tall
+  // display.
+  --hero-media-max: clamp(260px, 56vh, 560px);
+
+  // Vertical offset so anchor targets clear the sticky header.
+  --header-offset: 5rem;
+}
+
+// -----------------------------------------------------------------------------
+// Layout
+// -----------------------------------------------------------------------------
+:root {
+  --container-max: 1440px;
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --grid-gap: clamp(1rem, 0.5rem + 1vw, 2rem);
+
+  // A narrower measure for image-led content (see `.container--editorial`).
+  //
+  // This is a CAP, not a fixed width: below it the container stays exactly as
+  // fluid as it was, because `min(100% - gutters, cap)` only diverges once the
+  // viewport alone would exceed the cap. That is why 360–1024px are untouched
+  // and only large desktops engage it.
+  //
+  // 960px is derived, not guessed. The gutters already cost 2 x 4rem above
+  // 1200px, so a 1440px viewport yields a 1312px container — and in the
+  // collection's 12-column composition the widest card (span 8) then lands at
+  // 864 x 1080, i.e. a portrait taller than most laptop viewports. Capping the
+  // measure at 960px holds that card to 629 x 786 (about 27% smaller) and opens
+  // 240px of margin either side. 960 is also just above the 942px a 1024px
+  // viewport produces on its own, so the cap cannot clip the mid range.
+  --container-editorial: 960px;
+}
+
+// -----------------------------------------------------------------------------
+// Motion — purposeful only, no decorative motion.
+// -----------------------------------------------------------------------------
+:root {
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --duration-reveal: 600ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  // Stagger between revealed siblings — capped so it never feels slow.
+  --stagger: 80ms;
+
+  --focus-width: 2px;
+  --focus-offset: 3px;
+  --focus-radius: 1px;
+}

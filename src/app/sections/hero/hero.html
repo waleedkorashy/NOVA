@@ -1,0 +1,50 @@
+<!--
+  Hero. A labelled region so screen-reader users can jump straight to it from the
+  landmark list, and the single page-level <h1> lives here.
+
+  Copy states a design intent only: no customer counts, no awards, no press, no
+  certifications, no operating history, no invented product claims
+  (see AGENTS.md, "No fabricated social proof").
+-->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__inner">
+    <div class="hero__text">
+      <span class="eyebrow">Collection No. 01</span>
+
+      <h1 id="hero-title">Good rooms are made slowly.</h1>
+
+      <p class="lede">
+        A collection of solid-timber furniture shaped by Scandinavian restraint — proportioned
+        rather than decorated, and made to be kept instead of replaced.
+      </p>
+
+      <!--
+        Exactly one primary CTA in the viewport. The Lookbook is a genuine
+        secondary (.btn--secondary, outlined), so the hierarchy is carried by
+        weight and border rather than by colour alone.
+      -->
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#collection">Explore the Collection</a>
+        <a class="btn btn--secondary" href="#journal">View Lookbook</a>
+      </div>
+    </div>
+
+    <figure class="hero__figure">
+      <!--
+        Photograph by Claudio Schwarz — see src/assets/images/ATTRIBUTION.md.
+        The alt text describes only what is visible in the photograph. It makes no
+        claim that the furniture shown is NOVA product, since it is not.
+      -->
+      <img
+        class="hero__image"
+        [ngSrc]="image"
+        ngSrcset="960w, 1800w"
+        [sizes]="sizes"
+        [width]="width"
+        [height]="height"
+        priority
+        alt="Interior with a sofa and two lounge chairs on wood flooring, a patterned wall, daylight from a window and warm pendant lighting overhead."
+      />
+    </figure>
+  </div>
+</section>

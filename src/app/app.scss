@@ -1,0 +1,13 @@
+// NOVA — app shell
+//
+// The shell is deliberately near-empty: the sticky bar and footer own their own
+// styles in their components, and everything shared is global.
+//
+// The M1 `.shell-anchor` placeholder rules that used to live here were removed in
+// M7, with the last placeholder. `app.spec.ts` asserts
+// `querySelectorAll('.shell-anchor')` is zero, so the scaffold cannot come back
+// without also failing a test.
+
+:host {
+  display: block;
+}

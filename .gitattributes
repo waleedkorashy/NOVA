@@ -1,0 +1,17 @@
+# Normalise line endings in the repository, and check them out as LF everywhere.
+#
+# Without this, a Windows clone with core.autocrlf=true checks files out with
+# CRLF, and Prettier — which defaults to endOfLine: "lf" — then fails
+# `prettier --check .` on files nobody touched. Keep the working copy LF on all
+# platforms so formatting is reproducible.
+* text=auto eol=lf
+
+# Binary assets must never be line-ending normalised or diffed as text.
+*.woff2 binary
+*.webp binary
+*.avif binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary

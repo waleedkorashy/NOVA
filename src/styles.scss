@@ -1,0 +1,31 @@
+// =============================================================================
+// NOVA — global stylesheet entry point
+//
+// This file is the ONLY global stylesheet and it is deliberately small. All the
+// real work is split into the partials below, each owning one concern.
+//
+// WHY THIS STRUCTURE MATTERS (see AGENTS.md for the verified mechanism):
+//
+// `anyComponentStyle` (4 kB warn / 8 kB error) measures the COMPILED CSS of each
+// component's own style entry point. Sass @use inlines partials, so a component
+// that @use's a shared partial is charged the full compiled size — there is no
+// shared pool to borrow from. The global stylesheet, by contrast, is never
+// tagged as a component style and is measured only against the `initial` budget
+// (500 kB warn / 1 MB error) — roughly 125x the headroom.
+//
+// So the architecture is:
+//   • THIS file + partials  → shared, reusable styling → priced at `initial`
+//   • component .scss        → only what is local to that component → 8 kB
+//
+// Load order matters. @use hoists, but reading top-to-bottom documents the
+// intended cascade: reset, then tokens consumed by everything, then the layers
+// that build on them.
+// =============================================================================
+
+@use 'styles/reset';
+@use 'styles/tokens';
+@use 'styles/typography';
+@use 'styles/layout';
+@use 'styles/components';
+@use 'styles/motion';
+@use 'styles/utilities';

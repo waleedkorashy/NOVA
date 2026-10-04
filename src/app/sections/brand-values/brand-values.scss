@@ -1,0 +1,99 @@
+// Brand Values — three principles as numbered editorial columns (M4).
+//
+// Everything reusable comes from the global layer: `.container`, `.section`,
+// `.section--alt`, `.list-reset`, the shared `.numbered` column pattern
+// (hairline + index + title + body) in `_components.scss`, the fluid type scale
+// and the spacing tokens. This file owns only the track geometry and the local
+// index treatment.
+//
+// THE COMPOSITION, and why it is not three equal columns
+//
+// The failure mode for three sibling blocks of text is a pricing table. Three
+// equal 4/4/4 columns is the first thing that happens if you leave the grid
+// alone, and it is exactly the layout this section is supposed to avoid.
+//
+// So the desktop spans are deliberately unequal — 5 / 4 / 3 — and at 48rem the
+// third principle runs full width instead of sitting in a half-empty second
+// row. Two effects: the columns stop reading as a symmetric set, and the last
+// principle gets the full measure, which is the one that carries the closing
+// thought. The narrowing from 5 to 3 also sets a left-to-right rhythm that
+// reads as a sentence ending rather than a table.
+//
+// `minmax(0, 1fr)` everywhere, never a bare `1fr`: without the 0 minimum a long
+// word sets its track floor and can push the grid wider than the viewport.
+// `.min-w-0` would be a second, weaker guard for the same thing.
+
+:host {
+  display: block;
+}
+
+.values__list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: var(--grid-gap);
+  row-gap: var(--space-xl);
+
+  margin-block-start: var(--space-2xl);
+}
+
+// The index is set in the UI face at eyebrow size rather than in the display
+// face at headline size. That is a deliberate difference from Craft & Process:
+// here the number is a label on an argument, there it is the loudest thing in
+// the band. If both sections set a large display numeral, the page loses the
+// distinction between them.
+.values__index {
+  font-family: var(--font-ui);
+  font-size: var(--text-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  font-variant-numeric: lining-nums;
+  color: var(--color-accent);
+}
+
+// -----------------------------------------------------------------------------
+// Base: one column, stacked, each principle contained inside the gutter.
+// -----------------------------------------------------------------------------
+.values__item {
+  grid-column: span 1;
+}
+
+// -----------------------------------------------------------------------------
+// 48rem (768px): the plan's target breakpoint. Six columns.
+//
+// Row 1  3 + 3
+// Row 2  6        <- full measure for the closing principle
+// -----------------------------------------------------------------------------
+@media (width >= 48rem) {
+  .values__list {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .values__item {
+    grid-column: span 3;
+  }
+
+  .values__item:nth-child(3) {
+    grid-column: 1 / span 6;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 64rem (1024px): the desktop composition, 5 / 4 / 3 across twelve columns.
+// Unequal on purpose — see the note at the top of this file.
+// -----------------------------------------------------------------------------
+@media (width >= 64rem) {
+  .values__list {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .values__item:nth-child(1) {
+    grid-column: 1 / span 5;
+  }
+
+  .values__item:nth-child(2) {
+    grid-column: 6 / span 4;
+  }
+
+  .values__item:nth-child(3) {
+    grid-column: 10 / span 3;
+  }
+}

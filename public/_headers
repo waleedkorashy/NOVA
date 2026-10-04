@@ -1,0 +1,29 @@
+# Build output uses outputHashing: "all", so hashed bundles are safe to cache forever.
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts are served from a STABLE /assets/fonts path (the @font-face src is
+# root-absolute on purpose so the index.html preloads and the stylesheet agree).
+# The filenames carry no hash, so they are NOT covered by outputHashing. Cache
+# them for 30 days rather than a year: a font swap must be able to reach
+# returning visitors without changing the filename.
+/assets/fonts/*.woff2
+  Cache-Control: public, max-age=2592000, immutable
+
+# Images are imported from src/assets/images/ and emitted by the bundler into
+# /media, so they carry a content hash like the JS/CSS above. A changed image
+# means a changed filename, so caching them for a year is safe.
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+# index.html must never be cached, or clients pin to a stale bundle reference.
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Baseline hardening. Add a real CSP once third-party origins are known.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY

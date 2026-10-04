@@ -1,0 +1,97 @@
+// NOVA — site-footer
+//
+// The page's ending. Tokens and type come from the global layer; this file owns
+// only the two-column composition and the link treatment.
+//
+// NOT BUILT, AND WHY
+//
+// Plan §7 lists "nav columns, social placeholders". The nav is here. The social
+// placeholders are not, and their absence is deliberate: NOVA is a fictional
+// brand, so any account would be invented, and an inert row of dead links would
+// also be a set of fake controls that keyboard users can tab into and activate
+// for no reason. A footer that simply ends is the more honest ending. Approved
+// D4 — no `mailto:`, no `tel:`, no invented contact detail — is satisfied by
+// there being no contact mechanism of any kind here.
+//
+// TRANSITION
+//
+// `margin-block-start` was removed from `:host`. The Final CTA is an inverted
+// band, so the footer's hairline `border-block-start` now sits directly against
+// it: the page resolves as dark band → light footer with one rule between them.
+// The space above the rule comes from the CTA's own bottom padding, which is
+// where it belongs — a top margin here would have floated the rule away from the
+// band and opened an unexplained gap at the exact point the page is meant to
+// stop.
+
+:host {
+  display: block;
+  padding-block: var(--space-xl);
+
+  background-color: var(--color-bg-alt);
+  border-block-start: 1px solid var(--color-rule);
+}
+
+// Single column on mobile (wordmark, links, small print); wordmark against
+// links on one row from 48rem, with the small print on its own full-width row.
+.footer__inner {
+  display: grid;
+  align-items: start;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 48rem) {
+  .footer__inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-xl);
+  }
+
+  .footer__nav {
+    justify-self: end;
+  }
+}
+
+.footer__wordmark {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.18em;
+  line-height: 1;
+
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.footer__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-lg);
+}
+
+.footer__link {
+  font-family: var(--font-ui);
+  font-size: var(--text-small);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-text-soft);
+}
+
+.footer__meta {
+  display: grid;
+  gap: var(--space-2xs);
+  max-inline-size: var(--measure-narrow);
+}
+
+.footer__copyright {
+  font-size: var(--text-small);
+  color: var(--color-text-soft);
+}
+
+// Small print, so it is the lowest-contrast text on the page. --nova-muted is
+// 4.66:1 on --nova-paper-alt — clears AA, verified in IMPLEMENTATION_PLAN A21.3.
+.footer__disclosure {
+  font-size: var(--text-eyebrow);
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  text-wrap: pretty;
+}

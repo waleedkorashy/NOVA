@@ -1,0 +1,82 @@
+<!--
+  Editorial / Lifestyle (M5).
+
+  Composition follows IMPLEMENTATION_PLAN §7 rather than the `.grid` used by every
+  earlier section: one large image at the top, an offset caption beneath it, and a
+  text column whose pull-quote and body paragraph sit off the image's baseline.
+  The asymmetry is the point — a symmetrical two-column card arrangement here would
+  turn the page back into a template.
+
+  Heading order is h1 (Hero) → h2 (this section), handled by `ui-section-heading`,
+  which renders every section title at h2 and is the only place this section's id
+  lands. No h3: there is no subhead, so adding one would fabricate structure that
+  the content does not have.
+
+  The photograph is a <figure>/<figcaption> pair rather than a bare image so the
+  caption is programmatically associated with it. The frame reuses the global
+  `.figure` class (overflow, placeholder surface, `object-fit: cover`) exactly as
+  `ui-product-card` does, which keeps this component's stylesheet to composition
+  only.
+
+  Deliberately no hover zoom. `ui-product-card` scales on hover/focus because a
+  catalogue wants that affordance; this section is a single still image meant to be
+  read, not swiped, and an unused transform here would be decoration for its own
+  sake.
+
+  No links or buttons. Nothing here goes anywhere, so every focusable element added
+  would be a tab stop that exists only to be skipped (WCAG 2.4.3).
+-->
+<section id="journal" class="section editorial" aria-labelledby="editorial-title">
+  <div class="container">
+    <ui-section-heading
+      eyebrow="Journal"
+      title="The hours between things."
+      lede="What a room is like when no one is performing in it — which is most of the time, and all of the design."
+      [id]="'editorial-title'"
+    />
+
+    <div class="editorial__spread">
+      <figure class="editorial__figure">
+        <span class="figure editorial__frame">
+          <img
+            class="editorial__image"
+            [ngSrc]="image"
+            ngSrcset="640w, 1200w"
+            [sizes]="sizes"
+            [alt]="'A quiet interior in warm afternoon light, with an open doorway casting a bright band across the room.'"
+            [width]="width"
+            [height]="height"
+          />
+        </span>
+
+        <!--
+          Descriptive only, and deliberately different from the alt text rather than
+          a copy of it: the alt text is the full scene for a screen reader, this is
+          the short editorial line a reader sees. No claim, no mood adjective stack.
+        -->
+        <figcaption class="editorial__caption">
+          Warm sun falling through an open doorway, across a wooden floor.
+        </figcaption>
+      </figure>
+
+      <div class="editorial__aside">
+        <!--
+          A <blockquote> because it is a pull-quote, not an <em> inside a paragraph.
+          No <cite>: the line is the brand's own position, and attributing it to a
+          person or a publication would be inventing an attribution that does not
+          exist (AGENTS.md — no fabricated claims). The hairline gives it definition
+          without a box, which is the same device the numbered columns use.
+        -->
+        <blockquote class="editorial__quote">
+          <p>Nothing in a good room is arranged to be photographed.</p>
+        </blockquote>
+
+        <p class="editorial__body">
+          The collection is quiet by default. A chair takes a coat, a table takes a cup, a lamp
+          stays on for someone reading. None of it is waiting to become a centrepiece, and the room
+          is better for that.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

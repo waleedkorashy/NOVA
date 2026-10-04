@@ -1,0 +1,103 @@
+// Craft & Process — the full-width inverted band, three steps across (M4).
+//
+// Everything reusable comes from the global layer: `.container`, `.section`,
+// `.section--invert` (which supplies the background AND the foreground tokens),
+// `.list-reset`, the shared `.numbered` pattern, the fluid type scale and the
+// spacing tokens. This file owns only the track geometry and the local index
+// treatment.
+//
+// WHY THE INVERT BAND IS FULL-BLEED FOR FREE
+//
+// The band is the section background, not a wrapper: `.section--invert` paints
+// `--color-bg-invert` on the <section> itself, which is a block-level child of
+// <main>. That means it runs edge to edge with no full-bleed utility, no
+// `100vw` width and no negative-margin escape hatch — so it cannot pick up the
+// scrollbar overflow that `100vw` would introduce at every breakpoint. It also
+// means `position: sticky` on the header still overlaps it correctly.
+//
+// WHY THE STEPS ARE EVEN, UNLIKE THE PRINCIPLES
+//
+// Brand Values uses 5 / 4 / 3 because three arguments of unequal weight want an
+// uneven rhythm. These three steps are a *sequence* — material, joint, finish —
+// and uneven tracks in a sequence read as a mistake rather than a composition.
+// The editorial weight on this band comes from the inverted surface and the
+// oversized numerals; the grid stays honest.
+
+:host {
+  display: block;
+}
+
+.craft__list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: var(--grid-gap);
+  row-gap: var(--space-xl);
+
+  margin-block-start: var(--space-2xl);
+}
+
+// The index is the loudest element on the band — set in the display face, three
+// times eyebrow size, in the invert accent. `--color-accent-invert` is 8.46:1
+// on `--nova-night`, so it clears AA as text with a wide margin, unlike the
+// light-band `--color-accent` which sits at 5.60:1.
+.craft__index {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1rem + 2.4vw, 3.25rem);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  font-variant-numeric: lining-nums;
+  color: var(--color-accent-invert);
+}
+
+// -----------------------------------------------------------------------------
+// Base: one column, stacked, each step contained inside the gutter.
+// -----------------------------------------------------------------------------
+.craft__step {
+  grid-column: span 1;
+}
+
+// -----------------------------------------------------------------------------
+// 48rem (768px): the plan's target breakpoint. Two columns.
+//
+// Row 1  3 + 3
+// Row 2  6        <- the finishing step takes the full measure
+// -----------------------------------------------------------------------------
+@media (width >= 48rem) {
+  .craft__list {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .craft__step {
+    grid-column: span 3;
+  }
+
+  .craft__step:nth-child(3) {
+    grid-column: 1 / span 6;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 64rem (1024px): three even tracks across twelve columns — 4 + 4 + 4.
+//
+// The placements are written out longhand instead of a bare `span 4` because
+// `:nth-child(3)` from the 48rem block is the more specific selector. Leaving it
+// to cascade would keep step 3 full width at desktop and the band would read as
+// 2 + 1 rather than 3 across.
+// -----------------------------------------------------------------------------
+@media (width >= 64rem) {
+  .craft__list {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .craft__step:nth-child(1) {
+    grid-column: 1 / span 4;
+  }
+
+  .craft__step:nth-child(2) {
+    grid-column: 5 / span 4;
+  }
+
+  .craft__step:nth-child(3) {
+    grid-column: 9 / span 4;
+  }
+}

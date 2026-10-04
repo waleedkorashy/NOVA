@@ -1,0 +1,108 @@
+// =============================================================================
+// NOVA — layout primitives
+//
+// Shared structural classes. These are the layouts sections will reuse, which
+// is why they live here rather than being re-declared (and re-paid for) in
+// eight component stylesheets.
+//
+// Container is percentage-based, never 100vw: 100vw includes the scrollbar and
+// is the classic cause of horizontal overflow on mobile.
+//
+// Global layer — not subject to the 8 kB anyComponentStyle budget.
+// =============================================================================
+
+.container {
+  width: min(100% - (2 * var(--gutter)), var(--container-max));
+  margin-inline: auto;
+}
+
+.container--narrow {
+  width: min(100% - (2 * var(--gutter)), 820px);
+  margin-inline: auto;
+}
+
+.container--wide {
+  width: min(100% - (2 * var(--gutter)), 1760px);
+  margin-inline: auto;
+}
+
+// A deliberately narrower measure for image-led sections. Token-driven and
+// fluid like `.container` — see `--container-editorial` for why the cap sits
+// where it does. Use it where the imagery should read as a portrait object
+// rather than a full-bleed tile.
+.container--editorial {
+  width: min(100% - (2 * var(--gutter)), var(--container-editorial));
+  margin-inline: auto;
+}
+
+// 12-column editorial grid. Fluid gap, no breakpoint needed for the gap itself.
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--grid-gap);
+}
+
+// Vertical section rhythm — generous whitespace is the brand.
+.section {
+  padding-block: var(--section-y);
+}
+
+.section--tight {
+  padding-block: calc(var(--section-y) * 0.6);
+}
+
+// Inverted band. Sets both colours so children inherit correctly.
+.section--invert {
+  background-color: var(--color-bg-invert);
+  color: var(--color-text-invert);
+
+  h1,
+  h2,
+  h3 {
+    color: var(--color-text-invert);
+  }
+
+  .eyebrow {
+    color: var(--color-accent-invert);
+  }
+
+  .lede {
+    color: var(--color-text-invert-soft);
+  }
+
+  hr {
+    border-color: var(--color-rule-invert);
+  }
+}
+
+// Alternating surface band, for section-to-section rhythm without a hard edge.
+.section--alt {
+  background-color: var(--color-bg-alt);
+}
+
+// Full-bleed wrapper for imagery that should run to the viewport edge.
+.bleed {
+  width: 100%;
+}
+
+// Vertical stack / horizontal cluster — spacing primitives so components do
+// not each need their own gap rules.
+.stack > * + * {
+  margin-block-start: var(--flow-space, var(--space-sm));
+}
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cluster-space, var(--space-sm));
+}
+
+.cluster--between {
+  justify-content: space-between;
+}
+
+// Anchor targets clear the sticky header so a jump never hides the heading.
+[id] {
+  scroll-margin-top: var(--header-offset);
+}

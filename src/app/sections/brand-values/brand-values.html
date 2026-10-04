@@ -1,0 +1,61 @@
+<!--
+  Brand Values. `aria-labelledby` points at the h2 inside <ui-section-heading>, so
+  the region announces its own name in the landmark list.
+
+  No `id` on the <section>, and that is deliberate. The approved nav anchors are
+  #collection, #about, #journal and #contact, and plan §4.4 assigns #about to
+  <app-brand-story> in M6 — the brand *story*, not these values. Claiming #about
+  here would create a duplicate target, and the M1 shell placeholder would then
+  have two owners. The section stays unaddressed until M6 replaces the
+  placeholder.
+
+  `<ol>` rather than `<ul>`: the three principles are an ordered argument, and
+  the sequence is real content rather than decoration. `role="list"` sits
+  alongside `.list-reset` because stripping the markers with CSS alone makes
+  Safari and VoiceOver drop the list semantics entirely.
+
+  Each column carries a *visible* index numeral that is `aria-hidden`. The
+  numeral is not the accessible source of the order — the `<ol>` already
+  announces "list, 3 items" and exposes position. Exposing both would make a
+  screen reader read "1 of 3, list item, 01" for one principle. Hiding the
+  visual numeral keeps the sighted reading and the announced reading identical.
+-->
+<section class="section section--alt values" aria-labelledby="values-title">
+  <div class="container">
+    <ui-section-heading
+      eyebrow="Principles"
+      title="Three decisions, restated."
+      lede="Not a manifesto. Three answers that settle most of the arguments before they start."
+      [id]="'values-title'"
+    />
+
+    <ol class="list-reset values__list" role="list">
+      <li class="numbered values__item">
+        <span class="values__index" aria-hidden="true">01</span>
+        <h3 class="numbered__title">Proportion settles it.</h3>
+        <p class="numbered__body">
+          Line, seat height, leg spacing. When those three agree, a piece is finished — everything
+          after that is subtraction.
+        </p>
+      </li>
+
+      <li class="numbered values__item">
+        <span class="values__index" aria-hidden="true">02</span>
+        <h3 class="numbered__title">The joint stays visible.</h3>
+        <p class="numbered__body">
+          Wedged tenons and through-mortises, sized to be read from the side. A joint hidden behind
+          a face is a joint that has not been thought about twice.
+        </p>
+      </li>
+
+      <li class="numbered values__item">
+        <span class="values__index" aria-hidden="true">03</span>
+        <h3 class="numbered__title">It should age, not expire.</h3>
+        <p class="numbered__body">
+          Surfaces are chosen for how they wear. A piece earns its place by looking better in year
+          five than it did on the day it arrived.
+        </p>
+      </li>
+    </ol>
+  </div>
+</section>

@@ -1,0 +1,156 @@
+// =============================================================================
+// NOVA — typography
+//
+// Base element typography, the @font-face declarations for the two approved
+// self-hosted variable families, and the shared heading classes.
+//
+// This is where fluid type does the heavy lifting: `clamp()` on a token means
+// responsive type is written once instead of in every component's media
+// queries. That is a primary reason component stylesheets can stay small.
+//
+// Global layer — not subject to the 8 kB anyComponentStyle budget.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// @font-face — both families SIL OFL 1.1 (licence files shipped alongside).
+// Variable woff2: one file covers every weight. Latin subset, hinting stripped
+// (browsers hint at render time). Preloaded from index.html.
+//
+// The src paths are ROOT-ABSOLUTE on purpose. A relative url() would make the
+// bundler re-emit the fonts into ./media/ under a content hash, which would then
+// disagree with the stable paths index.html preloads — a guaranteed 404 on the
+// preload plus a duplicated ~184 kB in the deploy. Root-absolute URLs are left
+// untouched by the CSS pipeline, so the files are served straight from the
+// /assets/fonts path that angular.json copies them to (see angular.json
+// "assets"). That also keeps ONE copy of each font in the deploy.
+//
+// public/_headers marks /assets/fonts/*.woff2 immutable, so a stable filename
+// still gets long-lived caching.
+// -----------------------------------------------------------------------------
+// unicode-range matches the ranges actually baked into the subset. Do not widen
+// it to a catch-all: the browser uses it to decide whether to download the font
+// at all, so a broader range means a download that cannot cover the codepoint.
+//
+// The declared font-weight range mirrors each font's REAL fvar axis, not the
+// upstream axis:
+//   Newsreader  wght 300-800  (upstream goes to 200)
+//   Archivo     wght 100-900  (wdth pinned at 100, so that axis is gone)
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 800;
+  src: url('/assets/fonts/Newsreader-Variable.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0100-017F, U+02C6-02DC, U+2010-2015, U+2018-201A, U+201C-201E, U+2020-2022,
+    U+2026, U+2030, U+2039, U+203A, U+2044, U+20AC, U+2122, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/assets/fonts/Archivo-Variable.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0100-017F, U+02C6-02DC, U+2010-2015, U+2018-201A, U+201C-201E, U+2020-2022,
+    U+2026, U+2030, U+2039, U+203A, U+2044, U+20AC, U+2122, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+// -----------------------------------------------------------------------------
+// Base type
+// -----------------------------------------------------------------------------
+body {
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+.h-display {
+  font-family: var(--font-display);
+  font-weight: var(--weight-regular);
+  color: var(--color-text);
+}
+
+h1 {
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+}
+
+h2 {
+  font-size: var(--text-h2);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.015em;
+}
+
+h3 {
+  font-size: var(--text-h3);
+  line-height: var(--leading-heading);
+}
+
+h4,
+h5,
+h6 {
+  font-family: var(--font-ui);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+// Long-form copy is constrained to a readable measure.
+.prose p {
+  max-width: var(--measure);
+}
+
+.prose p + p {
+  margin-top: var(--space-md);
+}
+
+.prose a,
+.link-underline {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--color-accent);
+  transition: text-decoration-color var(--duration-fast) var(--ease-out);
+}
+
+.prose a:hover,
+.link-underline:hover {
+  text-decoration-color: var(--color-text);
+}
+
+// -----------------------------------------------------------------------------
+// Shared type utilities
+// -----------------------------------------------------------------------------
+
+// Editorial eyebrow: small, uppercase, tracked out. Used above section titles.
+.eyebrow {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.lede {
+  font-size: var(--text-body-lg);
+  line-height: 1.6;
+  color: var(--color-text-soft);
+  max-width: var(--measure-narrow);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+// Numerals in a serif face for editorial moments (process steps, indices).
+.numeral {
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums;
+}

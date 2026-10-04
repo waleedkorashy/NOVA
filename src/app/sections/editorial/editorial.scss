@@ -1,0 +1,165 @@
+// Editorial / Lifestyle (M5) — composition only.
+//
+// THE RULE from AGENTS.md: shared and reusable styling goes in `src/styles.scss`
+// and its `_partials`; this file contains only what is genuinely local to this
+// section. Concretely, that means:
+//   * the global `.figure` class already supplies `overflow: hidden`, the
+//     placeholder surface and `object-fit: cover`, so the frame needs one line
+//   * `.container`, `.section` and the heading are all global
+//   * the pull-quote size is `--text-pullquote` in `_tokens.scss`
+// Nothing here is a generic "layout" abstraction — it is the one asymmetric
+// composition Plan §7 asks for, and it is not reused by any other section.
+//
+// Deliberately NOT using the global `.grid` (12 × `var(--grid-gap)`) that every
+// earlier section uses, and deliberately not using `ui-section-heading`'s sibling
+// patterns. This section is the page's one "not a grid" moment.
+//
+// Media range decisions (see the note in each block): the source is 2:3, but the
+// delivered frames are 4:5. At full container width a 2:3 frame is 1060px tall on
+// a 768px tablet — taller than the viewport, which is the failure the acceptance
+// criteria name. Cropping to 4:5 in CSS is the first half of that fix; narrowing
+// the measure is the second, because at 4:5 a full-width frame was still the
+// largest object on the page. Every breakpoint now caps the photograph at 5/6 of
+// the container or less, which holds the frame between 330px and 600px tall.
+
+:host {
+  display: block;
+}
+
+.editorial__spread {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin-block-start: var(--space-2xl);
+}
+
+// <figure> carries a UA margin; this section sets its own rhythm instead.
+//
+// The image takes 5 of the 6 tracks rather than the full measure, so the
+// photograph is inset on the right at every width instead of running edge to
+// edge. Same grid mechanism the breakpoints use, so it tracks the container and
+// needs no fixed width — 5/6 of the measure is the cap, not a pixel value.
+.editorial__figure {
+  margin: 0;
+  grid-column: 1 / span 5;
+}
+
+// 4:5 from a 2:3 source — art-directed crop applied at render time by the global
+// `.figure` object-fit, so the delivered file stays the full uncropped frame.
+.editorial__frame {
+  aspect-ratio: 4 / 5;
+}
+
+// THE OFFSET. The caption is indented from the image's left edge so the text
+// below it does not line up with the frame above — the single device that makes
+// this read as editorial rather than as a card.
+//
+// It is NOT reset on mobile, which is worth stating because it was the obvious
+// thing to do and it was tried on review. Below 48rem there is no second column
+// for the caption to misalign against, so the indent has nothing to be "offset"
+// from — it just looks like a first-line indent. At 360px the frame is 267px and
+// 48px of it still leaves 219px (~27ch) for the caption, which is a comfortable
+// measure, so the device survives the narrowest supported width intact. Dropping
+// it would have meant re-establishing the editorial relationship at the one size
+// where the page is being read on a phone.
+.editorial__caption {
+  margin-block-start: var(--space-sm);
+  padding-inline-start: var(--space-xl);
+  font-size: var(--text-small);
+  line-height: var(--leading-tight);
+  color: var(--color-text-muted);
+  max-inline-size: 32ch;
+}
+
+// Full measure and stacked under the image at the base size. Without an explicit
+// column it would auto-place into a single track of the 6-column grid and
+// collapse to 1/6 of the container.
+.editorial__aside {
+  display: grid;
+  gap: var(--space-md);
+  margin-block-start: var(--space-xl);
+  grid-column: 1 / -1;
+}
+
+// A hairline instead of a box: no background, no border-radius, no shadow. The
+// brand carries depth with whitespace, and `border-radius: 0` is global.
+.editorial__quote {
+  margin: 0;
+  padding-inline-start: var(--space-md);
+  border-inline-start: 1px solid var(--color-rule);
+
+  font-family: var(--font-display);
+  font-size: var(--text-pullquote);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  max-inline-size: 18ch;
+}
+
+.editorial__quote p {
+  margin: 0;
+}
+
+.editorial__body {
+  color: var(--color-text-soft);
+  max-inline-size: var(--measure-narrow);
+}
+
+// -----------------------------------------------------------------------------
+// ≥ 48rem — 6 columns, image 3 wide, text block offset RIGHT by one column.
+//
+// The text block starting at column 2 rather than column 1 is the offset
+// repeating at section scale. Auto-placement puts it on the row below the image
+// (its columns overlap the image's, so it cannot share row 1), which is why the
+// explicit `grid-column` needs no explicit row.
+//
+// Narrowing the image from 4 tracks to 3 is what keeps the tablet size in the
+// same proportion as desktop instead of letting it run at two-thirds measure.
+// -----------------------------------------------------------------------------
+@media (width >= 48rem) {
+  .editorial__spread {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .editorial__figure {
+    grid-column: 1 / span 3;
+  }
+
+  .editorial__aside {
+    grid-column: 2 / span 5;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// ≥ 64rem — 12 columns, image 4 wide, text block 5 wide at columns 7–11.
+//
+// The image is narrower than its 4 tracks on purpose: `max-inline-size: 90%`
+// resolves against the grid area, so the frame keeps ~10% air on its right even
+// inside the column it spans. A 12-column grid cannot express the ~3.5 tracks
+// this wants — 3 is too small and 4 is 442px — and a fixed px width would stop
+// tracking the container. The percentage is measured from the grid area, so it
+// stays proportional at every viewport instead of freezing at one number.
+//
+// 1280 → 353px, 1440 → 397px. The base and 48rem sizes are deliberately left at
+// the already-approved values; the brief for this pass is desktop balance only.
+//
+// `align-self: end` is what buys the "generous negative space" from Plan §7: the
+// text bottom-aligns with the image bottom, leaving the upper right quiet instead
+// of centring a short text column against a tall image and floating it in the
+// middle of nothing.
+// -----------------------------------------------------------------------------
+@media (width >= 64rem) {
+  .editorial__spread {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .editorial__figure {
+    grid-column: 1 / span 4;
+    max-inline-size: 90%;
+  }
+
+  .editorial__aside {
+    grid-column: 7 / span 5;
+    align-self: end;
+    margin-block-start: 0;
+  }
+}

@@ -1,0 +1,54 @@
+<!--
+  One nav, two presentations. Below 60rem this element is the slide-down panel;
+  from 60rem up it is the inline nav. Duplicating the links would create two
+  `Primary` landmarks and double the tab stops.
+
+  The wordmark targets the header's own `id="top"` so it scrolls back up without
+  a full page reload. It deliberately does NOT point at #collection — that is
+  what the primary CTA is for.
+
+  `.bar` exists so the panel's containing block is unambiguous: an absolutely
+  positioned child of a GRID container resolves against its grid area, not the
+  host box, which mis-sized the panel.
+
+  The wordmark is the NOVA identity: a typographic mark, no icon. `aria-label`
+  adds the destination ("NOVA — Home") that the visible word NOVA cannot
+  express, while the visible text stays exactly "NOVA" so the brand is never
+  announced with a duplicated or invented name.
+-->
+<div class="bar">
+  <a class="wordmark" href="#top" aria-label="NOVA — Home">
+    <span class="wordmark__text" aria-hidden="true">NOVA</span>
+  </a>
+
+  <button
+    #menuTrigger
+    type="button"
+    class="menu-trigger"
+    aria-controls="site-nav"
+    [attr.aria-label]="menuOpen() ? 'Close menu' : 'Open menu'"
+    [attr.aria-expanded]="menuOpen()"
+    (click)="toggle()"
+  >
+    <span class="menu-trigger__bars" aria-hidden="true">
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+
+  <nav #siteNav id="site-nav" class="nav" aria-label="Primary" (keydown)="onNavKeydown($event)">
+    <ul class="nav__list">
+      @for (link of navLinks; track link.fragment) {
+        <li>
+          <a class="nav__link" [href]="'#' + link.fragment" (click)="onNavigate()">
+            {{ link.label }}
+          </a>
+        </li>
+      }
+    </ul>
+
+    <a class="btn btn--primary nav__cta" href="#collection" (click)="onNavigate()">
+      Explore the Collection
+    </a>
+  </nav>
+</div>

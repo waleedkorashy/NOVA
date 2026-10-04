@@ -1,0 +1,58 @@
+<!--
+  Product card. An <article>, not a link: the product name is the single focusable
+  element so the tab order stays one-stop-per-card and the accessible name stays
+  short. `:focus-within` in the stylesheet gives keyboard focus the same response
+  as pointer hover.
+
+  The image is deliberately NOT wrapped in its own link. Two anchors pointing at
+  the same destination per card means a keyboard user tabs past the product twice
+  and screen readers announce "link" twice for one piece of furniture.
+
+  The frame reuses the global `.figure` class for overflow, placeholder surface
+  and `object-fit`, so the only thing this component styles is the aspect ratio
+  the section hands it and the hover/focus response.
+
+  Copy is descriptive only — named materials and form, never claims about
+  durability ratings, awards, popularity or customer numbers (AGENTS.md).
+-->
+<article class="card">
+  <span class="figure card__figure" [style.--card-aspect]="aspect()">
+    <img
+      class="card__image"
+      [ngSrc]="product().image.src"
+      [alt]="product().image.alt"
+      [width]="product().image.width"
+      [height]="product().image.height"
+      [priority]="product().image.priority ?? false"
+    />
+  </span>
+
+  <div class="card__body">
+    <span class="eyebrow card__category">{{ product().category }}</span>
+
+    <h3 class="card__name">
+      <a class="card__link" href="#contact">{{ product().name }}</a>
+    </h3>
+
+    <!--
+      Materials as one editorial specification line, not as tags or pills. A
+      comma-separated line reads as specification; three rounded chips read as
+      filter UI.
+    -->
+    @if (product().materials; as materials) {
+      <p class="card__materials">{{ materials.join(' · ') }}</p>
+    }
+
+    <p class="card__summary">{{ product().summary }}</p>
+
+    <!--
+      Price rendered from the data, not from a formatted string, so a future API
+      can change either the amount or the currency without touching this template.
+      Zero decimals: a made-to-order catalogue does not quote cents, and trailing
+      `.00` down every line reads as a spreadsheet.
+    -->
+    <p class="card__price">
+      {{ product().price | currency: product().currency : 'symbol' : '1.0-0' }}
+    </p>
+  </div>
+</article>

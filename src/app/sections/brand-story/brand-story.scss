@@ -1,0 +1,144 @@
+// Brand Story — plan §7's two-column philosophy story, and the owner of `#about`.
+//
+// Two columns of text and nothing else. No photograph: a new image could not be
+// sourced with honest attribution and every approved asset is already on the page
+// (see brand-story.ts for the full reasoning). That constraint happens to serve
+// the brief — plan §7 asks for a rhythm "deliberately different" from the
+// Editorial section, and a section with no photograph cannot be mistaken for one.
+//
+// THE RHYTHM IS DELIBERATELY NOT EDITORIAL'S
+//
+// Editorial is image-left / text-right with a pull-quote and an offset caption.
+// This is text-left / statements-right, no media, no quote, and the two columns
+// are separated by TWO empty tracks (7 and 8) rather than one. Same 12-column
+// vocabulary as the rest of the page, opposite use of it — which is what stops
+// three consecutive text-led sections (Brand Values, Craft & Process, Brand
+// Story) from reading as the same section three times. Values and Craft are
+// numbered three-up columns; this is one measure of prose against three short
+// lines in the display serif.
+//
+// Everything reusable is global: `.container`, `.section`, `.prose`,
+// `.list-reset`, the fluid type scale, the spacing tokens. This file owns only
+// the grid geometry and the creed's type treatment.
+
+// Vertical rhythm, tightened by the M6 visual review.
+//
+// `.section` pads both edges by the full `--section-y` (147.2px at 1440), and with
+// the copy's own line-height the section ran to 929px on a 900px window — a full
+// screen of mostly air. Three spacing steps come down together:
+//
+//   - section padding   1.00 -> 0.75 of `--section-y`
+//   - spread margin     `--space-2xl` -> `--space-xl` (64px -> 48px)
+//   - stacked row-gap   `--space-2xl` -> `--space-xl`
+//
+// 0.75 rather than the global `.section--tight` (0.6) on purpose: that modifier
+// exists for utility bands, and at 0.6 this section starts to read cramped against
+// a three-line creed. The goal was to remove dead air, not to close the section up.
+//
+// Scoped as `.section.story` because `.section` is a single class as well — same
+// specificity, so `.story` alone would win or lose on injection order.
+.section.story {
+  padding-block: calc(var(--section-y) * 0.75);
+}
+
+:host {
+  display: block;
+}
+
+.story__spread {
+  display: grid;
+  row-gap: var(--space-xl);
+  margin-block-start: var(--space-xl);
+}
+
+// The global `.prose` already caps each paragraph at `--measure` (65ch) and sets
+// the rhythm between them. The only thing this adds is `min-width: 0`, so the grid
+// track can shrink the column below its content instead of forcing overflow.
+//
+// Deliberately NOT re-capping the column at `--measure-narrow` as well: the
+// paragraphs already hold their own measure, and capping the wrapper too would
+// pull the text back to ~422px inside a 668px track, turning the 255px
+// compositional hole into a ~500px void.
+.story__prose {
+  min-width: 0;
+}
+
+// Three short lines in the display serif, each under a hairline. This is the
+// `.numbered` device (rule, then type) with the numeral left off — there is
+// nothing to number, and an index here would imply a sequence the copy does not
+// have.
+.story__creed {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+}
+
+.story__creed-item {
+  border-block-start: 1px solid var(--color-rule);
+  padding-block-start: var(--space-sm);
+
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+
+  // The measure is the line's job, not the type scale's. A fluid h3 across a
+  // 4-of-12 track runs to three words a line; this lets each statement break
+  // once and only once.
+  max-inline-size: 16ch;
+}
+
+// -----------------------------------------------------------------------------
+// >= 48rem (768px): two columns, close together.
+//
+// Column 1 carries the prose and column 2 the creed, with no empty track between
+// them yet — at this width a hole would be most of the remaining measure.
+// -----------------------------------------------------------------------------
+@media (width >= 48rem) {
+  .story__spread {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+    row-gap: 0;
+  }
+
+  .story__prose {
+    grid-column: 1 / span 4;
+  }
+
+  .story__creed {
+    grid-column: 5 / span 2;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// >= 64rem (1024px): the desktop spread.
+//
+// Prose on `span 6`, the creed on `span 4` from column 9, leaving columns 7 and 8
+// empty. At 1440 that is a ~255px hole between the two text columns.
+//
+// Worth being precise about, because the obvious claim is false: this is NOT a
+// bigger hole than Editorial's. Editorial puts its figure on `span 4` and starts
+// its aside at column 7, so it also leaves two tracks empty — ~299px at 1440. Both
+// sections use the same "thing, hole, thing" vocabulary because it is the page's
+// one compositional idea.
+//
+// What makes this section read differently is everything else: no photograph, no
+// pull-quote, no offset caption; a single measure of prose with real paragraph
+// breaks against three ruled lines in the display serif; and the right-hand column
+// is the terminal one (9–12) rather than the trailing one (7–11). Stating the
+// shared grid honestly matters more than inventing a difference that is not there.
+// -----------------------------------------------------------------------------
+@media (width >= 64rem) {
+  .story__spread {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .story__prose {
+    grid-column: 1 / span 6;
+  }
+
+  .story__creed {
+    grid-column: 9 / span 4;
+  }
+}

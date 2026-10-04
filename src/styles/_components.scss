@@ -1,0 +1,193 @@
+// =============================================================================
+// NOVA — shared component patterns
+//
+// Classes reused across multiple sections. Because these are shared, they are
+// priced against the `initial` budget (1 MB) instead of each component's 8 kB
+// `anyComponentStyle` budget — the whole point of the global-first strategy.
+//
+// Sections compose these; they should not redefine button or hairline styling.
+// A component that needs something genuinely local puts it in its own .scss.
+//
+// Global layer — not subject to the 8 kB anyComponentStyle budget.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Buttons
+//
+// Two variants only. The primary CTA is deliberately singular in the design —
+// "Explore the Collection". Avoid introducing a third variant.
+// -----------------------------------------------------------------------------
+.btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--color-text);
+  --btn-border: var(--color-text);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+
+  min-height: 44px; // WCAG 2.2 target size
+  padding: 0.75rem 1.5rem;
+
+  font-family: var(--font-ui);
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+
+  background-color: var(--btn-bg);
+  color: var(--btn-fg);
+  border: 1px solid var(--btn-border);
+  border-radius: 0; // editorial restraint — no pill shapes
+
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
+}
+
+.btn--primary {
+  --btn-bg: var(--color-text);
+  --btn-fg: var(--color-bg);
+  --btn-border: var(--color-text);
+}
+
+.btn--primary:hover {
+  --btn-bg: var(--color-accent);
+  --btn-border: var(--color-accent);
+  --btn-fg: var(--color-text-on-accent);
+}
+
+.btn--secondary {
+  --btn-bg: transparent;
+  --btn-fg: var(--color-text);
+  --btn-border: var(--color-rule);
+}
+
+.btn--secondary:hover {
+  --btn-border: var(--color-text);
+}
+
+.btn--invert {
+  --btn-bg: transparent;
+  --btn-fg: var(--color-text-invert);
+  --btn-border: var(--color-rule-invert);
+}
+
+.btn--invert:hover {
+  --btn-border: var(--color-text-invert);
+}
+
+// -----------------------------------------------------------------------------
+// Hairline rule — the editorial divider used between sections and columns.
+// -----------------------------------------------------------------------------
+.rule {
+  height: 1px;
+  background-color: var(--color-rule);
+  border: 0;
+}
+
+// -----------------------------------------------------------------------------
+// Numbered editorial column — a hairline rule, an index, a title, a paragraph.
+//
+// Used by Brand Values (three principles) and Craft & Process (three steps),
+// which is why it lives here rather than in either component: it is shared, so it
+// is priced against the `initial` budget instead of being paid for twice.
+//
+// It is deliberately NOT a card. No border box, no radius, no shadow, no surface
+// change, no fill. A hairline above the column is the only separator, and the
+// index is set in the display face at the same size as a label. Those two
+// omissions are what stop three sibling blocks from reading as a SaaS feature
+// grid — the failure mode this pattern exists to avoid.
+//
+// The rule is drawn with `border-top` on the column itself rather than an
+// `<hr>`, so the line is bound to the column it introduces and cannot drift
+// away from it at a different column width.
+// -----------------------------------------------------------------------------
+.numbered {
+  display: grid;
+  align-content: start; // never stretch: the rule stays at the top of the column
+  border-top: 1px solid var(--color-rule);
+  padding-block-start: var(--space-sm);
+}
+
+.numbered__title {
+  margin-block-start: var(--space-2xs);
+  // The measure is the column's job, not the type scale's. A fluid h3 across a
+  // 3-of-12 track would otherwise run to four words a line.
+  max-inline-size: 20ch;
+}
+
+.numbered__body {
+  margin-block-start: var(--space-3xs);
+  color: var(--color-text-soft);
+  max-inline-size: 34ch;
+}
+
+// On the inverted band the default ink is unusable (1.02:1), so these three are
+// re-pointed at the invert tokens. Only the *rule* and the *body* need it — the
+// title is an h3, which .section--invert already recolours.
+.section--invert .numbered {
+  border-top-color: var(--color-rule-invert);
+}
+
+.section--invert .numbered__body {
+  color: var(--color-text-invert-soft);
+}
+
+// -----------------------------------------------------------------------------
+// Figure / image treatment
+//
+// Every editorial image sits in a fixed-ratio box so there is no layout shift
+// on load. object-fit keeps cropping deliberate at each breakpoint.
+// -----------------------------------------------------------------------------
+.figure {
+  // `display: block` is load-bearing, not cosmetic. `width`, `height` and
+  // `aspect-ratio` have NO effect on an inline box, so without this a
+  // `<span class="figure">` collapses to line-box behaviour: the frame gets no
+  // ratio, `.figure img { width/height: 100% }` resolves against nothing, and the
+  // image renders at its intrinsic size. Any element using this class must be a
+  // block box for the documented fixed-ratio behaviour to actually happen.
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-bg-alt);
+}
+
+.figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// Subtle zoom on hover — compositor-only property.
+.figure--zoom img {
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .figure--zoom:hover img {
+    transform: scale(1.03);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Focus
+//
+// One global focus treatment. Never remove focus styling; if a design needs a
+// subtler ring it changes these tokens, not individual components.
+// -----------------------------------------------------------------------------
+:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--focus-radius);
+}
+
+// Keyboard users get the ring; pointer users do not. Suppress the ring for
+// pointer interactions only where the browser still shows :focus-visible.
+:focus:not(:focus-visible) {
+  outline: none;
+}

@@ -1,0 +1,48 @@
+<!--
+  Footer. The last structural element, and the page's clearest "the story ends
+  here" signal — so it is a rule, four links, a copyright line and the
+  disclosure. Nothing else.
+
+  It is NOT a place to be useful. There is no address, phone, email, social
+  account, company registration or certification, because NOVA is fictional and
+  inventing any of those is a portfolio-integrity failure (AGENTS.md; approved
+  D4). Plan §7 sketched "social placeholders"; the M7 brief rules them out
+  explicitly, and an inert row of dead social links would also be a set of fake
+  controls, so they are omitted rather than stubbed.
+
+  Every href below resolves to exactly one owner, all of them real sections:
+  #collection (FeaturedCollection), #about (BrandStory), #journal (Editorial)
+  and #contact (FinalCta).
+-->
+<footer class="container footer__inner">
+  <!--
+    The wordmark returns to the top of the document, reusing the home target the
+    header wordmark already points at: `#top` is owned by the `site-header` host
+    element (`host: { id: 'top' }`, since M1). So the footer needed no new anchor
+    of its own and cannot have become a second owner of anything.
+  -->
+  <a class="footer__wordmark" href="#top">NOVA</a>
+
+  <nav class="footer__nav" aria-label="Footer">
+    <ul class="list-reset footer__list">
+      <li><a class="footer__link" href="#collection">Collection</a></li>
+      <li><a class="footer__link" href="#about">About</a></li>
+      <li><a class="footer__link" href="#journal">Journal</a></li>
+      <li><a class="footer__link" href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="footer__meta">
+    <p class="footer__copyright">&copy; {{ year }} NOVA</p>
+
+    <!--
+      Portfolio-integrity disclosure, verbatim as approved. NOVA is a fictional
+      brand, not a real furniture maker: no claims here are backed by
+      real-world evidence.
+    -->
+    <p class="footer__disclosure">
+      NOVA is a fictional brand created as a design and front-end portfolio piece. No products,
+      testimonials, or offers shown on this site are real.
+    </p>
+  </div>
+</footer>
