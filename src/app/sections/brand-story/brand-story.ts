@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { SectionHeading } from '../../ui/section-heading/section-heading';
 
+import { Reveal } from '../../shared/directives/reveal';
+import { SectionHeading } from '../../ui/section-heading/section-heading';
 /**
  * Brand Story — plan §7's "two-column editorial text + portrait/detail image", and
  * the owner of the `#about` nav anchor.
@@ -50,7 +51,7 @@ import { SectionHeading } from '../../ui/section-heading/section-heading';
  */
 @Component({
   selector: 'app-brand-story',
-  imports: [SectionHeading],
+  imports: [Reveal, SectionHeading],
   templateUrl: './brand-story.html',
   styleUrl: './brand-story.scss',
 })

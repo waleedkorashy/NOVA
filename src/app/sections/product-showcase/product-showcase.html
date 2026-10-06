@@ -15,10 +15,16 @@
   The index items are plain text, not links. The cards above already send every
   product name to #contact; five more focusable rows all resolving to the same
   anchor would be five tab stops for no new destination.
+
+  M8 motion. Heading, photograph and detail column each settle once. The
+  photograph's reveal is on the `<img>`, not on `.showcase__media` — that element
+  is `position: sticky` at >=64rem, and leaving the transform off it keeps the
+  sticky travel independent of whether the reveal has run.
 -->
 <section class="section showcase" aria-labelledby="showcase-title">
   <div class="container">
     <ui-section-heading
+      novaReveal
       eyebrow="In Detail"
       title="One piece, at reading distance."
       lede="The collection is six objects. This is the closest look at any of them — proportion, material and the measurements that decide how a room holds together."
@@ -42,6 +48,7 @@
           <span class="figure showcase__frame">
             <img
               class="showcase__image"
+              novaReveal="image"
               [ngSrc]="piece.image.src"
               [alt]="piece.image.alt"
               [width]="piece.image.width"
@@ -56,7 +63,7 @@
           to travel, so the range index below is load-bearing for the effect, not
           decoration.
         -->
-        <div class="showcase__detail">
+        <div class="showcase__detail" novaReveal>
           <div class="showcase__piece">
             <span class="eyebrow showcase__category">{{ piece.category }}</span>
 

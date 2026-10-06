@@ -103,6 +103,21 @@ the 156 kB one.
 
 Inside the ≤ 3 MB limit in `src/assets/README.md`.
 
+### The social card is not in this register, and should not be
+
+`public/og-image.jpg` (1200×630, 47,343 B) ships an image but is deliberately **absent from the
+register above**, for two reasons:
+
+1. **It is outside this directory.** The register covers `src/assets/images`; the card lives in
+   `public/` and is copied verbatim into the build root, exactly like `_headers` and `_redirects`.
+2. **It is generated, not photographed.** It is a typographic composition — `--nova-night` field,
+   tracked Archivo wordmark, clay rule, tagline — drawn from this project's own tokens and its own
+   OFL font subset. There is no photographer, no source URL and no third-party licence, so a
+   register row would have to invent all three. Rule 4 applies: do not caption an asset with a
+   provenance that does not exist.
+
+Adding it here would be the first false row in this file.
+
 ### Caption versus alt text, for this image only
 
 The rule above ("Alt text must not imply the furniture is NOVA product") is written

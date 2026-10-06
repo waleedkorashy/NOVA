@@ -35,7 +35,7 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "/assets",
-                "ignore": ["images/**/*"]
+                "ignore": ["images/**/*", "README.md"]
               }
             ],
             "styles": ["src/styles.scss"]

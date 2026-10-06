@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 
+import { Reveal } from '../../shared/directives/reveal';
+
 /**
  * Final CTA — plan §7's closing statement, and the M7 owner of `#contact`.
  *
@@ -31,9 +33,18 @@ import { Component } from '@angular/core';
  * title and lede are authored directly against the global `.eyebrow` / `h2` /
  * `.lede` classes, which carry all the typography; this component owns only the
  * centring and the measure.
+ *
+ * ## M8
+ *
+ * `Reveal` is the only import, and it is not a `ui-section-heading`. The class
+ * comment above records that this section deliberately does not use the shared
+ * heading primitive; the reveal is the M8 exception to "no imports", because
+ * motion is a cross-cutting concern owned by the global layer rather than
+ * something a section should reimplement.
  */
 @Component({
   selector: 'app-final-cta',
+  imports: [Reveal],
   templateUrl: './final-cta.html',
   styleUrl: './final-cta.scss',
 })

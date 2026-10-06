@@ -143,7 +143,7 @@ src/app/shared/data/products.ts (M3 — PRODUCTS; the only module that imports p
 src/assets.d.ts  → declares `*.webp` so images can be imported and fingerprinted
 src/assets/      fonts/ (Newsreader + Archivo woff2, OFL .txt)  images/ (ATTRIBUTION.md +
                   nova-hero-{960,1800}.webp — imported, not copied)  README.md
-public/  → favicon.ico, _redirects, _headers   (copied verbatim into output)
+public/  → favicon.{svg,ico}, apple-touch-icon.png, og-image.jpg, _redirects, _headers   (copied verbatim into output)
 ```
 
 No `app.routes.ts`. No `RouterOutlet`. No router reference remains anywhere in `src/`.
@@ -190,9 +190,19 @@ Data flow (API-ready, no backend today)
     → app-featured-collection, app-product-showcase
   future: HttpClient.get<Product[]>('/api/products') — no template change required
 
-Motion flow (progressive enhancement)
-  reveal directive ─ IntersectionObserver ─► add .is-revealed ─► unobserve()
+Motion flow (progressive enhancement — built in M8)
+  [novaReveal] ─► RevealCoordinator (ONE IntersectionObserver, rootMargin 0px 0px 10% 0px)
+                    ├─ canArm()? no  (reduced motion, or no IO) ─► .is-revealed, no motion state
+                    └─ canArm()? yes ─► .reveal (hidden) ─► intersects ─► .is-revealed + unobserve()
   base state = visible  ⇒  no JS / no IO ⇒ content still readable
+  stagger: [novaRevealIndex] ─► data-reveal-index ─► --duration-reveal + --stagger × n
+  variant: novaReveal="image" ─► .reveal--image on the <img> inside the overflow:hidden .figure
+
+  The bottom rootMargin is POSITIVE on purpose. A negative margin ("reveal a bit
+  later") permanently strands the last stretch of a fully scrolled page: the document
+  bottom sits flush with the viewport bottom, so anything in the final N% is forever
+  below the shrunken observer root and stays at opacity 0. Positive can only ever fire
+  early, which is harmless. Found by m8.mjs stranding 9 of 24 reveals.
 
 Nav flow (no router — D1 EXECUTED in M1)
   ONE <nav aria-label="Primary">, natively rendered in both presentations.
@@ -357,19 +367,19 @@ licence does not require it.
 
 ### Orphans / inconsistencies found in the current repo
 
-| Item                  | Detail                                                                                                                 | Action                                                                   |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| ~~Dead routing~~      | ~~`app.routes.ts` is `[]` while `app.ts` imports `RouterOutlet`~~                                                      | **Resolved in M1** — package, lockfile, `app.ts` and routes cleaned      |
-| ~~Scaffold coupling~~ | ~~`app.spec.ts` formerly asserted the Angular splash~~                                                                 | **Resolved in M1** — 5 shell tests replace the splash assertion          |
-| Stale docs            | `README.md` claims CLI `22.1.7` (installed 22.2.x) and documents `ng e2e`, which fails with `Cannot find "e2e" target` | Rewrite in M10                                                           |
-| ~~Empty styles~~      | ~~`src/styles.scss` = 1 comment; `styles-*.css` = 0 bytes~~                                                            | **Resolved in M0** — 7 partials, 9.77 kB compiled                        |
-| ~~Empty `app.scss`~~  | ~~`src/app/app.scss` = 0 bytes~~                                                                                       | **Resolved in M1** — 208 B for anchor placeholders only                  |
-| Placeholder meta      | ~~`index.html` title "Nova", no description/theme-color/OG~~                                                           | **Resolved in M0** — full metadata + 2 font preloads                     |
-| ~~Placeholder UI~~    | ~~`app.html` is the Angular welcome splash~~                                                                           | **Resolved in M1** — real shell; splash gone                             |
-| Favicon               | Default Angular `favicon.ico`; no SVG icon or `apple-touch-icon`                                                       | M8/M9                                                                    |
-| ~~Image pipeline~~    | ~~`.webp` could not be `import`ed — the builder had no loader for it, so local images had no fingerprinted URL~~       | **Resolved in M2** — `file` loader + `src/assets.d.ts` + `/media` output |
-| AGENTS.md updated     | Verified `anyComponentStyle` mechanics + the global-layer rule are now documented for future sessions                  | **Done** — see "Style budget mechanics" below                            |
-| No CI                 | Nothing runs on push or PR                                                                                             | Optional, after M10                                                      |
+| Item                  | Detail                                                                                                                       | Action                                                                                    |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| ~~Dead routing~~      | ~~`app.routes.ts` is `[]` while `app.ts` imports `RouterOutlet`~~                                                            | **Resolved in M1** — package, lockfile, `app.ts` and routes cleaned                       |
+| ~~Scaffold coupling~~ | ~~`app.spec.ts` formerly asserted the Angular splash~~                                                                       | **Resolved in M1** — 5 shell tests replace the splash assertion                           |
+| ~~Stale docs~~        | ~~`README.md` claimed CLI `22.1.7` (installed 22.2.x) and documented `ng e2e`, which fails with `Cannot find "e2e" target`~~ | **Resolved in M10** — both gone; `AGENTS.md` keeps the `ng e2e` warning                   |
+| ~~Empty styles~~      | ~~`src/styles.scss` = 1 comment; `styles-*.css` = 0 bytes~~                                                                  | **Resolved in M0** — 7 partials, 9.77 kB compiled                                         |
+| ~~Empty `app.scss`~~  | ~~`src/app/app.scss` = 0 bytes~~                                                                                             | **Resolved in M1** — 208 B for anchor placeholders only                                   |
+| ~~Placeholder meta~~  | ~~`index.html` title "Nova", no description/theme-color/OG~~                                                                 | **Resolved in M0** — full metadata + 2 font preloads                                      |
+| ~~Placeholder UI~~    | ~~`app.html` is the Angular welcome splash~~                                                                                 | **Resolved in M1** — real shell; splash gone                                              |
+| ~~Favicon~~           | ~~Default Angular `favicon.ico`; no SVG icon or `apple-touch-icon`~~                                                         | **Resolved in M8/M9** — SVG monogram + ICO + `apple-touch-icon`                           |
+| ~~Image pipeline~~    | ~~`.webp` could not be `import`ed — the builder had no loader for it, so local images had no fingerprinted URL~~             | **Resolved in M2** — `file` loader + `src/assets.d.ts` + `/media` output                  |
+| AGENTS.md updated     | Verified `anyComponentStyle` mechanics + the global-layer rule are now documented for future sessions                        | **Done** — see "Style budget mechanics" below                                             |
+| ~~No CI~~             | ~~Nothing runs on push or PR~~                                                                                               | **Done in M9** — `.github/workflows/deploy.yml` runs format → build → test → Pages deploy |
 
 ### Open items
 
@@ -493,7 +503,7 @@ from a shared global pattern, and neither declares an `id`.
 | Full-bleed band | The band is the **section's own background**, so it runs edge to edge with no full-bleed utility, no `100vw` and no negative-margin escape hatch. Verified at every width: `x = 0` and `right = clientWidth`                                                                                                                                                                                                                                                                                           |
 | Numeral         | Two adjacent numbered sections, deliberately different treatments: Brand Values sets a small tracked UI label, Craft & Process sets a display-serif numeral up to `clamp(2rem, …, 3.25rem)`. Identical treatments would collapse them into one repeated block                                                                                                                                                                                                                                          |
 | Lists / a11y    | `<ol role="list" class="list-reset">` on both — the steps are a real sequence. Visible numerals are `aria-hidden`: the `<ol>` already announces position, so exposing them too reads order twice. Each section is `aria-labelledby` its own `h2`; one `h1` page-wide; 1 `h2` + 3 `h3` per section                                                                                                                                                                                                      |
-| Keyboard        | **Neither section adds a tab stop** — both are static content, asserted in-browser and in `craft-process.spec.ts`. No `transition`/`animation` is declared on either, so reduced motion holds by construction (the global override still collapses the cascade to 0.01 ms, confirmed under emulated media)                                                                                                                                                                                             |
+| Keyboard        | **Neither section adds a tab stop** — both are static content, asserted in-browser and in `craft-process.spec.ts`. Neither declares motion of its own; since M8 the only transition on their items is the shared `.reveal` from the global layer, and reduced motion still holds because the directive refuses to arm and the global override collapses the cascade to 0.01 ms (confirmed under emulated media in `m8.mjs` §1)                                                                         |
 | Contrast        | Measured in-browser against the **resolved ancestor background**, not assumed: principles 14.55:1 title / 7.58:1 body; steps 16.45:1 title / 8.87:1 body. All clear AA 4.5:1                                                                                                                                                                                                                                                                                                                           |
 | Integrity (D2)  | This section **replaced** the planned testimonial block, so the drift risk is highest here. `craft-process.spec.ts` rejects facility, headcount, lead-time, credential, sustainability and scale vocabulary; `brand-values.spec.ts` rejects trading history, credentials and numeric claims; `app.spec.ts` adds a page-level guard scoped to `<main>`                                                                                                                                                  |
 | Verification    | `prettier --check .` clean · `ng build` clean · **Vitest 77/77 pass** (10 files; was 55/55 in 8) · **6 real-browser widths × all M4 assertions PASS** — spans 5/4/3 and 4/4/4 confirmed as real pixel widths (539/427/314 and 427/427/427 at 1440), band edge-to-edge, hairlines `1px solid`, `border-radius: 0` and `box-shadow: none` on every column, no overflow, no overlap, no tab stops · **M1–M3 regression re-run with both sections mounted: ALL PASS** (`m3.mjs` and `hero.mjs`, unchanged) |
@@ -689,16 +699,173 @@ defects, and both are documented in those harnesses: `hero.mjs` asserted exactly
 (M7 legitimately adds a Footer nav), and `m6.mjs` asserted exactly one remaining `.shell-anchor` (M7
 deletes the last one). Neither was weakened — both now assert the stronger, more specific truth.
 
+### Done - M8 Motion
+
+Purposeful motion only, and strictly progressive: the base state of every element is visible, and the
+reveal system only ever _adds_ animation. M8 added **one** shared directive, not a family of them —
+`_motion.scss` already carried the whole CSS contract and referenced a `shared/directives/reveal.ts`
+that did not exist, so the directive and its coordinator fill that gap rather than inventing a second
+mechanism. The unused `.curtain` and `.menu-enter` rules it referenced were removed.
+
+| Area           | What shipped                                                                                                                                                                                                                                                                             | Measured                      |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Reveal         | `Reveal` (`[novaReveal]`, `novaReveal="image"`, `[novaRevealIndex]`) over 24 elements: section headings, six collection cards, two three-item staggers, two editorial images, two asides/detail columns, the creed and the CTA block                                                     | `m8.mjs` 71/71                |
+| Coordinator    | `RevealCoordinator` — one root `IntersectionObserver` for the whole app, `threshold: 0`, **positive** bottom margin, reduced-motion flush on mid-session change, `DestroyRef` teardown                                                                                                   | `reveal.spec.ts`              |
+| Hero           | Untouched. No reveal, `opacity: 1`, no transform on load. No parallax, no scale change                                                                                                                                                                                                   | `m8.mjs`                      |
+| Images         | Image reveal sits on the `<img>` inside the `overflow: hidden` `.figure`, never on the frame. `scale(1.04)` is cropped by the frame, so approved dimensions and intrinsic sizes are unchanged and no image asset was touched                                                             | `m8.mjs` layout-shift section |
+| Reduced motion | Refuses to arm; durations collapse to 0.01 ms; `scroll-behavior: auto`; `.reveal` forced visible. Nothing is ever left faded out, before or after a scroll                                                                                                                               | `m8.mjs` §1                   |
+| Interaction    | CTA only: `translateY(-1px)` on hover (inside `@media (hover: hover)`), `translateY(0)` on press, 150 ms. No `scale()` — a growing button reads as a tappable widget, the SaaS register the page is written against. Nav links, product cards and the menu keep their existing behaviour | `m8.mjs` §7–8                 |
+| Mobile menu    | No close transition added. `menuOpen` flips immediately, which is what releases `inert`, restores focus and dismisses the panel; holding the panel for an exit animation would leave a keyboard user's focus outside an on-screen subtree                                                | `m8.mjs` §8                   |
+| Composition    | No section moved in document coordinates, document height identical (9140 → 9140), all 9 images decoded, no horizontal overflow at 360/390/768/1024/1280/1440 mid-animation _and_ after, plus 1280×720 and 1440×900                                                                      | `m8.mjs` §4–6                 |
+| Regressions    | m3 169 · m4 181 · m5 204 · m6 300 · m7 181 · m7-a11y 21 — **1056 checks, 0 failures**; 142 unit tests                                                                                                                                                                                    | —                             |
+
+**M8 timing was revised after first-pass review.** The initial values read as a flicker rather than a
+reveal, so the durations were slowed and given their own easing curve rather than borrowing the
+interaction curve. `--duration-reveal` 600 → **850 ms**, images **950 ms** (they read faster than text
+at equal duration, so they get the longer tail), stagger **120 ms** for a 3-step maximum of 240 ms.
+`--ease-reveal: cubic-bezier(0.4, 0, 0.2, 1)` was added for the motion specifically; `--ease-out` and
+`--ease-in-out` were left untouched so no existing transition changed. Measured in-browser:
+`m8-timing.mjs` confirmed 0.85 s / 0.95 s, stagger 0 / 0.12 / 0.24 s, `scale(1.04)` unchanged, and
+opacity visibly mid-transition. The final M8 gate: `prettier --check` clean · `npm run build`
+204.23 kB raw / 57.47 kB transfer · **142/142 unit tests** · `m8.mjs` 71/71 · **1564 individual
+assertions, 0 failures**, across hero, m3–m8, refine and m9.
+
+Counting note, because the two conventions disagree by ten. Each harness prints one `PASS` line per
+assertion **plus** an end-of-run `ALL CHECKS PASSED` banner, so the ten scripts emit 1574 `PASS`
+lines for 1564 real assertions. Earlier drafts of this file quoted 1573 — a mixed convention that
+counted the nine regression banners but not m9's. The assertion count is **1564**.
+
+Two **product** defects were found by `m8.mjs` and fixed, both of the "content invisible" class:
+
+1. `.reveal--image` and `data-reveal-index` were written **unconditionally** while only `.reveal` was
+   conditional, and the stylesheet selected `.reveal--image:not(.is-revealed)` without requiring
+   `.reveal`. Reduced-motion visitors got two editorial photographs pinned at `opacity: 0`, with no
+   rule able to restore them. Every host binding is now gated on `armed()`, and the CSS requires
+   `.reveal` in the image selector — defended at both the layer that writes state and the one that
+   reads it.
+2. The negative `rootMargin` described above stranded 9 of 24 reveals permanently.
+
+Two **harness** defects were also fixed, and neither was a page defect: `m3`–`m6` defaulted to port
+8099 (they take the URL as `argv[2]`, and all four are green against 4200), and the smooth-scroll
+settling in `m8.mjs`/`m7-a11y.mjs` measured mid-animation. `m7-a11y.mjs` also proved to be
+input-modality dependent: it walked focus with `next.focus()`, and Chrome correctly withholds
+`:focus-visible` from script-driven focus, so the ring only appeared when a keyboard-driving harness
+happened to run first. It now primes keyboard modality with a real Tab event.
+
+`m4.mjs` asserted that Brand Values and Craft & Process declare _no_ motion at all — true before M8 and
+obsolete after it, since M8 gave both a reveal. The assertion was **restated, not removed**: motion in
+those sections must come from the shared `.reveal` and animate only `opacity`/`transform`, which is the
+property the original check existed to protect. No existing test was weakened.
+
+### Complete - M9 Hardening
+
+Not another design milestone. Every M0–M8 visual decision was treated as frozen; M9 only fixed things
+that were genuinely broken or missing. One new in-browser audit, `m9.mjs`, covers twelve areas —
+metadata, social assets, landmarks, heading order, ids, images, control names, focus, contrast,
+responsive, performance, and the deployable output — **98 checks, 0 failures**.
+
+Four real defects were found and fixed. None of them is a redesign:
+
+1. **The site header exposed no `banner` landmark.** `<site-header>` is a custom element, so it carried
+   no implicit role, and its inner `<div class="bar">` is not a landmark either — so `<main>` and
+   `<footer>` were both reachable but the header was not. `site-footer` already used a native
+   `<footer>`, which is what made this an asymmetry rather than a decision. Fixed by changing that
+   `div` to a native `<header>`, not by adding `role="banner"`, per the native-semantics rule. No CSS
+   depended on the element name: `.bar` is styled by class, and the only element selector in the file
+   is `.menu-trigger__bars > span`.
+2. **`og:image` was a 404.** `src/index.html` pointed at `/og-image.jpg`, which did not exist, while its
+   own comment flagged the card as M9 work. `public/og-image.jpg` is now a real 1200×630 card, generated
+   from the approved tokens (`--nova-night` field, `--nova-bone` tracked Archivo wordmark at wght 600,
+   `--nova-clay-night` eyebrow and rule, `--nova-bone-dim` tagline) and the project's own variable
+   fonts, so it cannot drift from the site's palette or typography. Copy is **verbatim** from the
+   already-approved `og:description`, so nothing new is claimed about a fictional brand. 46 kB, RGB,
+   4:4:4 subsampled. `og:image:width` / `:height` / `:alt` and `twitter:image` / `twitter:image:alt`
+   were added so a scraper can lay the card out without decoding it first.
+3. **Six pointer targets were under the WCAG 2.5.8 AA floor of 24×24.** Both wordmarks (20 px and
+   18 px) and the four footer links (16 px). Padding would have been the obvious fix and the wrong one:
+   the header wordmark is a flex item and the footer links sit in a wrapping flex list, so padding would
+   have reflowed rows and moved the design. Each link instead grows its hit area with a transparent,
+   absolutely positioned `::after`, which extends the region that dispatches clicks with **no layout
+   effect at all**. `.footer__list` keeps its `--space-sm` row pitch and the footer does not move; the
+   audit asserts both zero layout shift and that no two expanded targets claim the same pixel.
+4. **Dev documentation was shipping to production.** The `src/assets` glob copied `**/*` into `/assets`,
+   so `src/assets/README.md` was deployed. Added `README.md` to that glob's `ignore` list — narrowly,
+   so the two `*-OFL.txt` licence files still ship, because the font licence requires distribution
+   alongside the fonts.
+
+Two suspected problems were investigated and dismissed as **not** defects, which is why four fixes
+rather than six:
+
+- **`decoding="sync"` on the Hero.** Not a bug. `NgOptimizedImage.getDecoding()` returns `sync` for any
+  image marked `priority` and returns _before_ consulting the input (`common.mjs:904`), so this is a
+  deliberate framework default for the LCP element and is not overridable. Asserting `async` would have
+  been fighting Angular over a non-issue.
+- **The 145-character Hero `alt`.** WCAG 1.1.1 sets no length limit, and the text accurately describes
+  a detailed interior photograph. An arbitrary character cap was removed rather than the alt text
+  shortened to satisfy it.
+
+Five harness defects were also fixed — every one of which would have produced a false failure:
+`renderedW > 0` was being used as a proxy for "in the viewport" (a lazy image reserves its box from
+`width`/`height`, so it reports a width before it has ever loaded); the fast rAF scroll in the CLS
+measurement outran lazy loading, so decode was sampled while requests were still in flight; contrast
+was judged against an assumed white background instead of the resolved ancestor; the request count was
+asserted against the **dev** server, where each module is a separate request and the count says nothing
+about the deployed page; and a `document` reference leaked into Node scope and crashed the run.
+
+**Resolved in M10 — the placeholder is gone.** `canonical`, `og:url`, `og:image` and `twitter:image`
+previously pointed at `https://nova.example.com/`, an RFC 2606 reserved placeholder, on the grounds
+that inventing a domain would be fabrication. That reasoning was right at the time and wrong now,
+because a real production origin **does** exist and is confirmed three ways: the project name
+`nova-furniture` in `.github/workflows/deploy.yml` and `package.json`, the same name in the
+`README.md` deployment table, and `https://nova-furniture.pages.dev/` serving the built app. All four
+tags now use that origin, with `og:image` pointing at
+`https://nova-furniture.pages.dev/og-image.jpg`. There is no custom domain, so the Pages host is the
+canonical one — not a temporary value waiting to be replaced.
+
+**The deployed build still predates this.** `public/_redirects` serves `index.html` for unmatched
+paths, so on the live site `/og-image.jpg` answers **HTTP 200 with `Content-Type: text/html`** — a
+missing asset that looks like a present one. Check `Content-Type`, not the status code. The corrected
+metadata and the card reach production only on the next `npm run deploy`.
+
+**Deploy artifact** (`dist/nova/browser`): 23 files, 2.07 MiB, largest file 242.9 kB — comfortably
+inside Cloudflare's 20,000-file and 25 MiB-per-file limits. Component stylesheet budgets measured by
+compiling each `.scss`: largest is `site-header.scss` at **3.44 kB**, under the 4 kB warning; the
+global layer is 12.04 kB and exempt from `anyComponentStyle`. All 13 components are green.
+
+### M10 — documentation & case study
+
+Delivered. `docs/CASE_STUDY.md` is the portfolio write-up; `README.md` gained a Motion section and
+had three stale claims corrected; `IMPLEMENTATION_PLAN.md` and this map had verification claims that
+had been pre-marked ✅ without the work behind them rewritten to match what was actually measured.
+
+Corrections worth recording, because each was a claim a reader could have relied on:
+
+| Claim                                       | Reality                                                                         |
+| ------------------------------------------- | ------------------------------------------------------------------------------- |
+| "AXE: **zero** serious/critical violations" | **No AXE scan was ever run.** D5 defers `axe-core`; baseline is manual + CDP    |
+| "All interactive targets ≥44×44px"          | 44×44 on trigger and CTAs; 24–26px elsewhere. **24×24 is the AA floor** (2.5.8) |
+| "Screenshots captured at six widths"        | Captured to a working directory; **none committed**. 320px reflow re-verified   |
+| "Collection cards carry `srcset`"           | They ship **one width each**; only Hero and Editorial have `srcset`             |
+| `~201 kB raw / ~57 kB transfer`             | **204.23 kB raw / 57.47 kB transfer**                                           |
+| `--nova-bone` on `--nova-night` ~15.5:1     | **16.45:1** (recomputed from the shipped token values)                          |
+| `--nova-ink` on `--nova-paper` ~15.9:1      | **16.05:1**                                                                     |
+| `nova.example.com` absolute URLs            | **https://nova-furniture.pages.dev/**                                           |
+| M10 checkmarks (case study, etc.)           | `docs/` did not exist when they were written; delivered properly this pass      |
+
+Contrast ratios were recomputed from `src/styles/_tokens.scss` rather than trusted: all eight §21.3
+pairs check out, and the tightest shipping pair is `--nova-muted` on `--nova-paper-alt` at
+**4.66:1** (the footer disclosure).
+
 ### Not started
 
-M8 onward. **M8 (meticulous polish pass) is next.** M7 closed the last section: the page now
-ends Brand Story → Final CTA → Footer, and no `.shell-anchor` placeholder remains.
+**M11 (optional)** — `vitest-axe` / `axe-core` as a dev dependency. Requires explicit approval, since
+it is the one thing in the plan that adds a dependency. Nothing else is outstanding.
 
 ### Explicitly out of scope
 
 Authentication · registration · cart · checkout · payments · admin dashboard · order management ·
 user dashboard · CMS · backend · database · ASP.NET Core API · state-management library ·
-animation library · UI component library · automated a11y tooling (pending D5).
+animation library · UI component library · automated a11y tooling (deferred by D5).
 
 Product data is modelled so a future ASP.NET Core API can be attached **without changing any
 template** — that is the only forward-looking concession.

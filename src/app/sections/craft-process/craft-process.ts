@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 
+import { Reveal } from '../../shared/directives/reveal';
 import { SectionHeading } from '../../ui/section-heading/section-heading';
 
 /**
@@ -44,10 +45,16 @@ import { SectionHeading } from '../../ui/section-heading/section-heading';
  * spare. Note that `--color-text` on this band is 1.02:1 — effectively
  * invisible — so any child that forgets to inherit the invert tokens will fail
  * loudly rather than subtly. That is the intended failure mode.
+ *
+ * ## M8
+ *
+ * `Reveal` is the heading plus a 0/1/2 stagger, matching Brand Values. The
+ * invert surface needs no special handling: the reveal animates opacity and
+ * transform, and neither reads the band's ink.
  */
 @Component({
   selector: 'app-craft-process',
-  imports: [SectionHeading],
+  imports: [Reveal, SectionHeading],
   templateUrl: './craft-process.html',
   styleUrl: './craft-process.scss',
 })

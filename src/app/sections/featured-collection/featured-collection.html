@@ -19,6 +19,14 @@
   Every card frame is 4 / 5, matching the delivered photography exactly. The
   asymmetry is carried entirely by the column spans; see `aspects` in
   featured-collection.ts for why the ratio variety was dropped.
+
+  M8 motion. The heading and each card reveal; the Hero does not (it must be
+  immediately visible on arrival). The cards carry NO stagger index, and that is
+  deliberate: the grid is 1 / 2 / 3 columns depending on breakpoint, so any
+  index computed here would wave diagonally at one width and read correctly at
+  another. Without one, the cards in a row share a top edge, share a height, and
+  therefore cross the observer threshold together — the rows reveal in sequence
+  on their own, which is the editorial effect without the guesswork.
 -->
 <section id="collection" class="section collection" aria-labelledby="collection-title">
   <div class="container container--editorial">
@@ -29,6 +37,7 @@
       puts the id on the heading, where the label has to point.
     -->
     <ui-section-heading
+      novaReveal
       eyebrow="The Collection"
       title="Six pieces, made to be kept."
       lede="Proportion first, decoration last. Every piece is drawn to sit with the others and to age into the room rather than out of it."
@@ -37,7 +46,7 @@
 
     <ul class="list-reset collection__list" role="list">
       @for (product of products(); track product.id; let i = $index) {
-        <li class="collection__item">
+        <li class="collection__item" novaReveal>
           <ui-product-card [product]="product" [aspect]="aspects[i % aspects.length]" />
         </li>
       } @empty {

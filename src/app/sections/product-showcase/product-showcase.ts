@@ -1,5 +1,6 @@
 import { CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
+import { Reveal } from '../../shared/directives/reveal';
 import type { Product } from '../../shared/types/product';
 import { SectionHeading } from '../../ui/section-heading/section-heading';
 
@@ -80,7 +81,7 @@ import { SectionHeading } from '../../ui/section-heading/section-heading';
  */
 @Component({
   selector: 'app-product-showcase',
-  imports: [CurrencyPipe, NgOptimizedImage, SectionHeading],
+  imports: [CurrencyPipe, NgOptimizedImage, Reveal, SectionHeading],
   templateUrl: './product-showcase.html',
   styleUrl: './product-showcase.scss',
 })

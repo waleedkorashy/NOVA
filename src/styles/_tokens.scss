@@ -204,12 +204,42 @@
   --duration-fast: 150ms;
   --duration-base: 250ms;
   --duration-slow: 400ms;
-  --duration-reveal: 600ms;
+
+  // Reveal durations. Raised from 600ms in the M8 timing pass: at 600ms the
+  // reveals were technically present but not legible as motion at normal viewing
+  // speed, which is the same as not having them. 850ms is long enough to read as
+  // deliberate and short enough that a scroll never feels like it is waiting.
+  --duration-reveal: 850ms;
+
+  // Images get their own, slightly longer duration. A photograph has no text to
+  // anchor it, so the eye needs longer to resolve it as an arrival rather than a
+  // pop, and the extra time is spent entirely on opacity so the scale settles
+  // underneath it without drawing attention to itself.
+  --duration-reveal-image: 950ms;
+
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
-  // Stagger between revealed siblings — capped so it never feels slow.
-  --stagger: 80ms;
+  // Reveals do NOT use `--ease-out`.
+  //
+  // `--ease-out` is cubic-bezier(0.16, 1, 0.3, 1) — a heavily front-loaded
+  // easeOutExpo shape. Over a short 250ms it reads as responsive. Stretched
+  // across 850ms the same curve front-loads even harder: nearly all of the
+  // visible change lands in the first fraction of the duration and the remainder
+  // is a hang, which is the opposite of calm.
+  //
+  // This curve is close to linear through the middle and eases at both ends, so
+  // the reveal distributes across its full length. At a longer duration the
+  // content arrives gradually and settles, rather than appearing and then
+  // lingering. `--ease-out` is left untouched for buttons, links and menus, whose
+  // timings are already approved.
+  --ease-reveal: cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Stagger between revealed siblings — capped so a long list never feels slow.
+  // 120ms: enough for the cascade to be visible, small enough that the third
+  // item still starts within a quarter second. Groups are capped at three
+  // revealed siblings, so the worst-case added delay is 240ms.
+  --stagger: 120ms;
 
   --focus-width: 2px;
   --focus-offset: 3px;

@@ -19,10 +19,17 @@
   announces "list, 3 items" and exposes position. Exposing both would make a
   screen reader read "1 of 3, list item, 01" for one principle. Hiding the
   visual numeral keeps the sighted reading and the announced reading identical.
+
+  M8 motion. This is where the stagger earns its place: three short columns of
+  equal rank arriving in sequence, 80ms apart, is the argument the section is
+  making rendered as timing. `--duration-reveal` is 600ms, so the last column
+  lands at 760ms — slow enough to read as deliberate and short enough that
+  scrolling never feels like it is waiting for anything.
 -->
 <section class="section section--alt values" aria-labelledby="values-title">
   <div class="container">
     <ui-section-heading
+      novaReveal
       eyebrow="Principles"
       title="Three decisions, restated."
       lede="Not a manifesto. Three answers that settle most of the arguments before they start."
@@ -30,7 +37,7 @@
     />
 
     <ol class="list-reset values__list" role="list">
-      <li class="numbered values__item">
+      <li class="numbered values__item" novaReveal [novaRevealIndex]="0">
         <span class="values__index" aria-hidden="true">01</span>
         <h3 class="numbered__title">Proportion settles it.</h3>
         <p class="numbered__body">
@@ -39,7 +46,7 @@
         </p>
       </li>
 
-      <li class="numbered values__item">
+      <li class="numbered values__item" novaReveal [novaRevealIndex]="1">
         <span class="values__index" aria-hidden="true">02</span>
         <h3 class="numbered__title">The joint stays visible.</h3>
         <p class="numbered__body">
@@ -48,7 +55,7 @@
         </p>
       </li>
 
-      <li class="numbered values__item">
+      <li class="numbered values__item" novaReveal [novaRevealIndex]="2">
         <span class="values__index" aria-hidden="true">03</span>
         <h3 class="numbered__title">It should age, not expire.</h3>
         <p class="numbered__body">

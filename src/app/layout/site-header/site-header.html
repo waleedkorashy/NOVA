@@ -16,7 +16,15 @@
   express, while the visible text stays exactly "NOVA" so the brand is never
   announced with a duplicated or invented name.
 -->
-<div class="bar">
+<!--
+  A native <header> at the top level of the document maps to the implicit
+  `banner` landmark. <site-header> is a custom element and therefore carried no
+  implicit role at all, so the site header was unreachable by landmark
+  navigation even though <main> and <footer> were both exposed. M9 restored it
+  with the native element rather than `role="banner"`, matching site-footer and
+  the "prefer native semantics over ARIA roles" rule.
+-->
+<header class="bar">
   <a class="wordmark" href="#top" aria-label="NOVA — Home">
     <span class="wordmark__text" aria-hidden="true">NOVA</span>
   </a>
@@ -51,4 +59,4 @@
       Explore the Collection
     </a>
   </nav>
-</div>
+</header>

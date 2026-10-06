@@ -19,10 +19,17 @@
   the principles section). A process is a sequence and uneven steps would read as
   misalignment rather than rhythm; the editorial weight on this band comes from
   the inverted surface and the oversized numerals instead.
+
+  M8 motion. Same treatment as Brand Values — heading, then three steps 80ms
+  apart — because the two sections share the `.numbered` column pattern, and a
+  visitor scrolling from one to the other should meet the same timing rather than
+  learn it twice. The invert surface changes nothing: the reveal animates opacity
+  and transform, neither of which is affected by which ink is on the band.
 -->
 <section class="section section--invert craft" aria-labelledby="craft-title">
   <div class="container">
     <ui-section-heading
+      novaReveal
       eyebrow="Craft &amp; Process"
       title="How a piece gets made."
       lede="Method, in the order it happens: which material, how it is joined, and how it is finished."
@@ -30,7 +37,7 @@
     />
 
     <ol class="list-reset craft__list" role="list">
-      <li class="numbered craft__step">
+      <li class="numbered craft__step" novaReveal [novaRevealIndex]="0">
         <span class="craft__index" aria-hidden="true">01</span>
         <h3 class="numbered__title">Material first.</h3>
         <p class="numbered__body">
@@ -39,7 +46,7 @@
         </p>
       </li>
 
-      <li class="numbered craft__step">
+      <li class="numbered craft__step" novaReveal [novaRevealIndex]="1">
         <span class="craft__index" aria-hidden="true">02</span>
         <h3 class="numbered__title">Joinery, not hardware.</h3>
         <p class="numbered__body">
@@ -48,7 +55,7 @@
         </p>
       </li>
 
-      <li class="numbered craft__step">
+      <li class="numbered craft__step" novaReveal [novaRevealIndex]="2">
         <span class="craft__index" aria-hidden="true">03</span>
         <h3 class="numbered__title">A finish that can be repaired.</h3>
         <p class="numbered__body">

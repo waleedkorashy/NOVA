@@ -59,6 +59,17 @@
 
   color: var(--color-text);
   text-decoration: none;
+
+  // See `.wordmark` in site-header.scss: an 18px box is under the WCAG 2.5.8
+  // 24px floor, so the target grows via a transparent ::after. Padding would
+  // resize the grid item and push the rest of the footer down; this cannot.
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+  }
 }
 
 .footer__list {
@@ -74,6 +85,20 @@
   text-transform: uppercase;
   text-decoration: none;
   color: var(--color-text-soft);
+
+  // Same WCAG 2.5.8 treatment as the two wordmarks: a 16px link box is under the
+  // 24px AA floor. ::after grows the hit area without resizing the <li> that owns
+  // the row, so `.footer__list`'s flex line and its `--space-sm` row gap are
+  // untouched. At 5px the expanded 26px target still leaves 6px of clearance to
+  // the next wrapped row (32px pitch) and 27px to the next column (32px gap), so
+  // no two footer targets can claim the same pixel.
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+  }
 }
 
 .footer__meta {

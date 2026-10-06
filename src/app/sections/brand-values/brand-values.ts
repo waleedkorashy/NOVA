@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 
+import { Reveal } from '../../shared/directives/reveal';
 import { SectionHeading } from '../../ui/section-heading/section-heading';
 
 /**
@@ -36,10 +37,16 @@ import { SectionHeading } from '../../ui/section-heading/section-heading';
  * awards, no years of trading, no certification. A principle stated as a
  * principle ("the joint stays visible") is honest; the same sentence dressed as
  * a claim ("trusted by 400 makers") would not be.
+ *
+ * ## M8
+ *
+ * `Reveal` is the heading plus a 0/1/2 stagger across the three columns. This is
+ * the one section where the stagger is the point: three equal-rank principles
+ * arriving in order is the argument, rendered as timing.
  */
 @Component({
   selector: 'app-brand-values',
-  imports: [SectionHeading],
+  imports: [Reveal, SectionHeading],
   templateUrl: './brand-values.html',
   styleUrl: './brand-values.scss',
 })

@@ -10,6 +10,10 @@
   `id` sits on the <section> because it is the navigation target; the `h2` is
   what `aria-labelledby` points at, so the region is named by its own title
   rather than by the anchor it happens to own.
+
+  M8 motion. One reveal, on `.cta__inner` — the whole closing statement arrives
+  as a single object rather than eyebrow-then-title-then-button, which would read
+  as a sequence and make a three-line note feel like a funnel.
 -->
 <section id="contact" class="section section--invert cta" aria-labelledby="contact-title">
   <div class="container">
@@ -18,7 +22,7 @@
       action. The `.lede` and `.btn` classes are global, so this costs no extra
       component CSS for the type or the button.
     -->
-    <div class="cta__inner">
+    <div class="cta__inner" novaReveal>
       <span class="eyebrow cta__eyebrow">Closing note</span>
 
       <h2 id="contact-title" class="cta__title">Start with one piece.</h2>

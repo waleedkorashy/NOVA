@@ -46,7 +46,32 @@
   transition:
     background-color var(--duration-base) var(--ease-out),
     color var(--duration-base) var(--ease-out),
-    border-color var(--duration-base) var(--ease-out);
+    border-color var(--duration-base) var(--ease-out),
+    // Shorter than the colour changes, and deliberately so: a lift that trails
+    // the colour change feels like lag, while a lift that leads it feels like the
+    // button is anticipating the click. Plan §10 caps the CTA micro-interaction
+    // at 200ms; --duration-fast is 150ms.
+    transform var(--duration-fast) var(--ease-out);
+}
+
+// M8. A one-pixel lift on hover, and a return on press.
+//
+// Deliberately tiny. `--duration-slow` on a `scale()` was rejected: a button
+// that grows reads as a tappable UI widget, which is the SaaS register this
+// whole page is written against. `transform` only, so no layout is triggered and
+// nothing reflows on hover — a `margin` or `border-width` change here would push
+// the surrounding editorial grid.
+//
+// `:active` is NOT inside the `hover: hover` query: touch devices need the press
+// response too, and they have no hover to give.
+@media (hover: hover) {
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn--primary {

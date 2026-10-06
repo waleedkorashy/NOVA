@@ -272,17 +272,23 @@ Near-monochrome warm neutral + one restrained clay accent. No gradients, no glas
 | ------------------ | --------- | ------------------------------------- | ----------------- |
 | `--nova-paper`     | `#F3F0EA` | Page background (warm bone)           | —                 |
 | `--nova-paper-alt` | `#EAE5DC` | Secondary surface / alternating band  | —                 |
-| `--nova-ink`       | `#17150F` | Primary text                          | ~15.9:1           |
-| `--nova-ink-soft`  | `#4A453D` | Body / secondary text                 | ~8.3:1            |
-| `--nova-muted`     | `#6B6459` | Meta, captions, eyebrows              | ~5.1:1            |
+| `--nova-ink`       | `#17150F` | Primary text                          | 16.05:1           |
+| `--nova-ink-soft`  | `#4A453D` | Body / secondary text                 | 8.36:1            |
+| `--nova-muted`     | `#6B6459` | Meta, captions, eyebrows              | 5.14:1            |
 | `--nova-line`      | `#D8D1C5` | Hairline rules, borders               | decorative only   |
-| `--nova-clay`      | `#8F4E2E` | Single accent — links, focus, one CTA | ~5.6:1            |
+| `--nova-clay`      | `#8F4E2E` | Single accent — links, focus, one CTA | 5.60:1            |
 | `--nova-night`     | `#14120E` | Inverted section background           | —                 |
-| `--nova-bone`      | `#F3F0EA` | Text on `--nova-night`                | ~15.5:1           |
+| `--nova-bone`      | `#F3F0EA` | Text on `--nova-night`                | 16.45:1           |
 
-Contrast ratios are hand-computed estimates and **must be confirmed with AXE during
-implementation** (§11). Note `--nova-clay` was deliberately darkened from a more attractive
-`#A85F3C`, which measured ~4.2:1 and would fail AA at body sizes.
+Every ratio above is computed from the shipped token values with the WCAG 2.2 relative-luminance
+formula, and is restated on each token in `src/styles/_tokens.scss`. Two of them changed the palette:
+`--nova-clay` was darkened from a more attractive `#A85F3C`, which measured **4.23:1** and would fail
+AA at body sizes; and `--nova-ink` on `--nova-night` is **1.02:1** — unusable, and recorded as an
+explicit warning so no dark section can pair them.
+
+These ratios are **not** machine-verified by an AXE scan, because **D5** defers that tooling to the
+optional M11. They are computed from the token values, so a colour change must be recomputed rather
+than assumed to be caught automatically.
 
 Discipline: the accent is **restrained but not numerically capped**. Use it intentionally for
 hierarchy, emphasis, interaction, or brand identity, and keep it visually consistent. Avoid
@@ -547,8 +553,10 @@ No SSR, so all metadata is static in `src/index.html`.
 - `outputHashing: "all"` + the existing `public/_headers` gives immutable caching for hashed assets
   and `no-cache` for `index.html`.
 - Removing the router (D1) removes the single largest avoidable JS payload.
-- Zero new runtime dependencies. Target: **initial total < 350 kB raw / < 100 kB transfer**
-  (currently 216 kB / 59 kB with zero app code).
+- Zero new runtime dependencies. Target: **initial total < 350 kB raw / < 100 kB transfer**. The
+  zero-app-code scaffold was 216 kB / 59 kB; the finished site measures **204.23 kB / 57.47 kB**, so
+  every kilobyte added by the application was more than paid for by removing the router and the
+  scaffold splash.
 - Animations compositor-only; no layout thrash; IO observers unobserved after firing.
 
 ---
@@ -648,7 +656,8 @@ M1** — router removal is application structure, not a foundation concern (D1 s
 - ✅ Deploy artifact verified in `dist/nova/browser`: 12 files / 0.4 MB total (Cloudflare caps:
   20,000 files, 25 MiB per file); largest single file `Newsreader-Variable.woff2` at 131.4 KB.
 - ✅ Palette contrast computed against the WCAG 2.2 luminance formula — every text pair clears AA,
-  most clear AAA (see §21 table). Re-confirmed with AXE in M9.
+  most clear AAA (see §21 table). Re-measured from the shipped token values in M9; **not** re-checked
+  with AXE, which D5 defers.
 
 **M0 status: complete.** Next on explicit instruction is **M1**, which executes D1 (router removal).
 
@@ -726,21 +735,58 @@ Closing CTA; footer with disclosure.
 
 Full sweep.
 
-- ✅ Screenshots captured at **360, 390, 768, 1024, 1280, 1440** — mobile is a designed layout,
-  not a squeezed desktop. ✅ **No horizontal overflow at any width**, verified by measurement.
-  ✅ All interactive targets ≥44×44px. ✅ AXE: **zero** serious/critical violations.
-  ✅ Keyboard-only pass; focus visible everywhere; skip-link works. ✅ 200% zoom / 320px reflow OK.
-  ✅ `dist/nova/browser` verified: `_redirects` + `_headers` present, initial bundle < 350 kB raw,
-  total deploy well under Cloudflare limits.
+- ✅ **No horizontal overflow at any width**, verified by measurement across **320, 360, 390, 768,
+  1024, 1280, 1440px** — mobile is a designed layout, not a squeezed desktop. Layout screenshots
+  were captured into a local working directory for visual review; **none are committed to the
+  repository**, so "responsive screenshots" in M10 means the tested widths and the measurements,
+  not image files.
+- ✅ Interactive targets clear the WCAG 2.5.8 AA floor of **24×24px**: 44×44 on the menu trigger and
+  CTAs, 24–26px on the wordmark and footer links, enlarged with a transparent `::after` hit area so
+  the type does not change. The original wording here — "all interactive targets ≥44×44px" — was an
+  AAA-level target recorded as though it were the AA requirement. It is not, and the smaller targets
+  are deliberate.
+- ✅ **320px reflow / 200% zoom passes** (WCAG 1.4.10), re-measured in M10.
+- ✅ Keyboard-only pass; focus visible everywhere; skip-link works; menu panel traps focus, marks the
+  background `inert`, and closes on `Escape`.
+- ✅ Contrast computed from the shipped token values on every pair; tightest shipping pair is the
+  footer disclosure at **4.66:1**.
+- ⚠️ **AXE was never run.** It requires `axe-core`, which **D5** defers to the optional M11; the M9
+  baseline is manual review plus the CDP harnesses. The previous "AXE: **zero** serious/critical
+  violations" checkmark was written into the plan before any scan existed. It has been removed rather
+  than left standing as evidence of work that did not happen.
+- ✅ `dist/nova/browser` verified: `_redirects` + `_headers` present in the output root, initial
+  bundle **204.23 kB raw / 57.47 kB transfer**, deploy payload **23 files / ~2.07 MB** — far inside
+  Cloudflare's 20,000-file and 25 MiB-per-file caps.
 
 ### M10 — Documentation & case study — _depends on M9_
 
 Portfolio packaging.
 
-- ✅ `README.md` rewritten: no stale CLI version, no non-existent `ng e2e`; Cloudflare Pages build
-  settings documented. ✅ `ATTRIBUTION.md` complete. ✅ Case study covers overview, concept, design
-  direction, solution, developer role, technologies, key features, responsive screenshots, live demo
-  URL, repo link. ✅ Fictional framing stated in README, footer, and case study.
+- ✅ `README.md` is current: no stale CLI version, no non-existent `ng e2e`, Cloudflare Pages settings
+  and the Direct-Upload deploy path documented, and the `200`-with-HTML `_redirects` trap explained.
+  Corrected during M10: the claim that the six collection cards carry `srcset` (they ship **one**
+  width each), a stale `~201 kB` bundle figure, and the absence of any motion documentation.
+- ✅ `src/assets/images/ATTRIBUTION.md` complete, with every byte count reconciled against the files
+  on disk (10 images, 1,710,558 B). `public/og-image.jpg` is recorded as **generated**, not
+  photographic, so it correctly carries no photographer row.
+- ✅ **`docs/CASE_STUDY.md` created** — overview and goal, design direction, UX structure,
+  architecture, data strategy, visual system, responsive design, accessibility, motion and the reveal
+  system, performance, asset strategy, engineering challenges and decisions, and validation, plus the
+  live URL and repository link.
+- ✅ Fictional framing stated in `README.md`, the footer and the case study. No fabricated metrics,
+  testimonials, ratings, customer counts, press logos or contact details anywhere.
+- ✅ Absolute metadata URLs corrected from the `nova.example.com` placeholder to the real origin
+  **https://nova-furniture.pages.dev/** in `canonical`, `og:url`, `og:image` and `twitter:image`.
+  There is no custom domain, so the Pages host is the canonical one — confirmed in
+  `.github/workflows/deploy.yml`, `package.json`, and against the live site.
+- ✅ False verification claims corrected rather than carried forward: AXE (M9 above), the 44×44
+  target wording (M9 above), and the pre-marked M10 checkmarks that had been written before
+  `docs/` existed.
+- ⚠️ **Outstanding, and it needs credentials rather than code.** The deployed build predates the M9
+  and M10 work, so the corrected metadata and the social card reach the live site only on the next
+  `npm run deploy`. Until then, do not treat the live HTML as current. Verify with a `Content-Type`
+  check: `_redirects` answers `200` with `index.html` for a missing file, so a `200` alone proves
+  nothing.
 
 ### Optional M11 — Automated a11y testing
 
@@ -774,13 +820,18 @@ The project is done when **all** hold:
 1. `npx prettier --check .`, `npm run build`, `npm test -- --watch=false` all pass.
 2. **Zero** `anyComponentStyle` warnings at 4 kB and zero errors; `angular.json` budgets unmodified.
 3. **Zero** new runtime dependencies; no animation library; no UI library.
-4. Screenshots at all six target widths with **no** horizontal overflow and no clipped content.
-5. AXE reports **zero** serious/critical violations; full keyboard traversal works.
+4. Measured across **320, 360, 390, 768, 1024, 1280, 1440px**: **no** horizontal overflow and no
+   clipped content. Layout screenshots are a review aid held outside the repository.
+5. Full keyboard traversal works — skip link, visible focus ring, trapped menu focus, `Escape` to
+   close, background `inert`. Contrast computed from token values; every text pair ≥ 4.5:1 and
+   tap targets ≥ 24×24px (WCAG AA). **An AXE scan is not part of this criterion**, per D5; it is
+   proposed as the optional M11.
 6. `prefers-reduced-motion` fully honoured; all content visible without JS.
-7. Initial bundle < 350 kB raw / < 100 kB transfer.
+7. Initial bundle < 350 kB raw / < 100 kB transfer — **measured: 204.23 kB raw / 57.47 kB transfer.**
 8. Deploy artifact verified in `dist/nova/browser` with `_redirects` and `_headers` intact.
 9. Zero fabricated claims in code, copy, or docs; fictional disclosure present in the footer.
-10. Case study complete with live demo URL and repository link.
+10. Case study complete with live demo URL and repository link — **delivered as
+    [`docs/CASE_STUDY.md`](docs/CASE_STUDY.md) in M10.**
 
 ---
 
@@ -789,8 +840,15 @@ The project is done when **all** hold:
 **Plan approved** with D1 (remove router), D2 (omit testimonials), D3 (EUR), D4 (inert contact), and
 the accent-frequency adjustment incorporated. D5 (automated a11y tooling) remains optional.
 
-**M0 — Foundations is complete.** Next step on explicit instruction is **M1**, which executes the
-approved D1 (router removal). `@angular/router` was intentionally left installed through M0.
+**M0 through M9 are complete and visually approved.** The next step on explicit instruction is
+**M10 — documentation & case study**, which is delivered in `docs/CASE_STUDY.md` plus corrections to
+this plan, `README.md`, `PROJECT_MAP.md`, `AGENTS.md`, `ATTRIBUTION.md` and the absolute URLs in
+`src/index.html`. **M11 remains optional and has not been started** — it needs explicit approval for
+the `axe-core` dev dependency that D5 defers.
+
+One claim in this plan was corrected rather than allowed to stand: the M9 section previously carried
+a checkmark reading "AXE: zero serious/critical violations". No scan was ever run, because D5 defers
+the tooling. The checkmark has been replaced with what was actually verified.
 
 Resolved during M0: the **"Journal" nav anchor** maps to `<app-editorial>` (`id="journal"`) because
 no Journal section is planned (§4.4). Confirmed — no ninth section, no change to milestone
@@ -874,7 +932,9 @@ Computed ratios:
 | `--nova-clay-night`  | `--nova-night` | 8.46  | AAA   |
 | `--nova-bone-strong` | `--nova-clay`  | 6.27  | AA    |
 
-These are still re-verified with AXE in M9 (D5 automated tooling remains optional).
+These ratios are re-measured from the shipped token values on every visual milestone. They are **not**
+served by an AXE scan — D5 defers that tooling — so a colour edit here must be re-computed, not
+assumed to be caught automatically.
 
 ### 21.4 Scroll reveal is progressive enhancement
 

@@ -1,6 +1,7 @@
 import { IMAGE_LOADER, NgOptimizedImage, type ImageLoaderConfig } from '@angular/common';
 import { Component } from '@angular/core';
 
+import { Reveal } from '../../shared/directives/reveal';
 import { SectionHeading } from '../../ui/section-heading/section-heading';
 
 import editorialLarge from '../../../assets/images/nova-editorial-1200.webp';
@@ -65,7 +66,7 @@ const SMALL_VARIANT_WIDTH = 640;
  */
 @Component({
   selector: 'app-editorial',
-  imports: [NgOptimizedImage, SectionHeading],
+  imports: [NgOptimizedImage, Reveal, SectionHeading],
   // Same scoped-loader approach as the Hero, and for the same reason: a global
   // loader would be invented infrastructure every later image would have to adopt.
   // It only participates in this component's own image.

@@ -1,0 +1,88 @@
+# Deploy NOVA to Cloudflare Pages on every push to main.
+#
+# The Pages project is a Direct Upload project, which Cloudflare will not let you
+# switch to Git integration afterwards. GitHub Actions is therefore not wiring up
+# Cloudflare's built-in CI — it just runs the same `wrangler pages deploy` that a
+# human would run locally, so pushing to main does what `npm run deploy` does.
+#
+# Required repository secrets (Settings > Secrets and variables > Actions):
+#   CLOUDFLARE_API_TOKEN   an API token with Account > Cloudflare Pages > Edit
+#   CLOUDFLARE_ACCOUNT_ID  the Cloudflare account ID, scoped to this account
+#
+# The token is deliberately never stored in this file or anywhere in the repo.
+
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  # Manual trigger, so a deploy can be repeated without pushing an empty commit.
+  workflow_dispatch:
+
+# Never let two deploys race. A newer push supersedes an in-flight deploy rather
+# than queueing behind it, which is what you want for a static site.
+concurrency:
+  group: pages-deploy-main
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # Matches the Cloudflare Pages build image and the local setup.
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The same three checks required before a local push, run here so a red
+      # build can never reach production. `npm run build` is the only step that
+      # typechecks Angular templates, so it is not optional.
+      - name: Check formatting
+        run: npx prettier --check .
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test -- --watch=false
+
+      # Stages a flat copy of the build with index.html at the upload root.
+      # Wrangler deploys a folder, never a zip, and uploading dist/ instead puts
+      # index.html one level too deep.
+      - name: Stage the deploy directory
+        run: npm run deploy:package
+
+      - name: Deploy
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Pinned to the version this project was last verified against, so a
+          # Wrangler major bump cannot silently change deploy behaviour. Bump it
+          # deliberately and re-verify a deploy.
+          wranglerVersion: 4.147.0
+          command: pages deploy deploy --project-name nova-furniture --branch main --commit-dirty=true
+
+      - name: Print the deployment URL
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+          ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+        run: |
+          echo "Deployment: $DEPLOYMENT_URL"
+          echo "Production:  https://nova-furniture.pages.dev"
+          echo "Alias:       $ALIAS_URL"

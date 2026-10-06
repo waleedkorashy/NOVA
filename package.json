@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "deploy:package": "node scripts/package-deploy.mjs",
+    "deploy": "npm run build && npm run deploy:package && npx --yes wrangler@latest pages deploy deploy --project-name nova-furniture --branch main --commit-dirty=true"
   },
   "private": true,
   "packageManager": "npm@11.19.0",

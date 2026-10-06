@@ -1,4 +1,5 @@
 import { Component, input } from '@angular/core';
+import { Reveal } from '../../shared/directives/reveal';
 import type { Product } from '../../shared/types/product';
 import { ProductCard } from '../../ui/product-card/product-card';
 import { SectionHeading } from '../../ui/section-heading/section-heading';
@@ -33,7 +34,7 @@ import { SectionHeading } from '../../ui/section-heading/section-heading';
  */
 @Component({
   selector: 'app-featured-collection',
-  imports: [ProductCard, SectionHeading],
+  imports: [ProductCard, Reveal, SectionHeading],
   templateUrl: './featured-collection.html',
   styleUrl: './featured-collection.scss',
 })

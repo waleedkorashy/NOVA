@@ -5,7 +5,7 @@
 // properties (transform, opacity) so it never triggers layout.
 //
 // Scroll reveal is PROGRESSIVE ENHANCEMENT: the base state is visible, and the
-// `reveal` directive (shared/directives/reveal.ts, M8) only *adds* the
+// `reveal` directive (`app/shared/directives/reveal.ts`, M8) only *adds* the
 // animation. If JavaScript fails, IntersectionObserver never fires, or the user
 // prefers reduced motion, content is still fully visible and readable. A
 // hidden-by-default reveal would be a content-invisible failure mode.
@@ -17,6 +17,16 @@
 
 // -----------------------------------------------------------------------------
 // Reduced motion — the authoritative override.
+//
+// Reduced motion is defended twice, on purpose:
+//
+//   1. The `Reveal` directive refuses to ARM at all when the preference is set,
+//      so `.reveal` is never written and no transition is even scheduled. It also
+//      watches the preference, so turning it on mid-session reveals anything
+//      still pending instead of stranding it at `opacity: 0`.
+//   2. Everything below collapses durations anyway, and forces `.reveal`
+//      visible. This is the backstop for the case the directive cannot see:
+//      content that was already armed before the preference flipped.
 //
 // This comes last so it wins on specificity ties. It collapses durations
 // rather than removing rules, which keeps specificity stable and avoids
@@ -45,13 +55,19 @@
 // -----------------------------------------------------------------------------
 // Reveal
 //
-// Applied by the `reveal` directive. Elements start visible; the directive adds
-// the hidden state only when it has confirmed it can animate them back.
+// Applied by the `Reveal` directive (`[novaReveal]`). Elements start visible; the
+// directive adds the hidden state only when it has confirmed it can animate them
+// back.
+//
+// There is exactly ONE reveal mechanism in this project. An earlier draft also
+// carried a `.curtain` clip-path wipe; it was never applied to anything and has
+// been removed, so there is no second image treatment to drift out of step with
+// this one.
 // -----------------------------------------------------------------------------
 .reveal {
   transition:
-    opacity var(--duration-reveal) var(--ease-out),
-    transform var(--duration-reveal) var(--ease-out);
+    opacity var(--duration-reveal) var(--ease-reveal),
+    transform var(--duration-reveal) var(--ease-reveal);
 }
 
 .reveal:not(.is-revealed) {
@@ -64,11 +80,48 @@
   transform: translate3d(0, 0, 0);
 }
 
-// Slightly different treatment for images — a soft scale-up from full bleed
-// reads more like a photograph settling into place than a slide-in.
-.reveal--image:not(.is-revealed) {
+// Image reveal — a soft scale from slight oversize, which reads as a photograph
+// settling into place rather than sliding in.
+//
+// It is applied to the `<img>` INSIDE the `.figure` frame, never to the frame
+// itself, and that placement is load-bearing:
+//
+//   * `.figure` is the fixed-ratio box that reserves space before the image
+//     loads. Scaling the frame would grow the box by 4% for 600ms, which
+//     overlaps whatever sits beside it — and for a full-bleed frame it pushes
+//     past the viewport edge and flashes a horizontal scrollbar.
+//   * `.figure` already sets `overflow: hidden`, so scaling the image inside it
+//     simply crops the oversize. The frame's approved dimensions never change,
+//     and there is no overflow and no layout shift at any point.
+//
+// `product-card.scss` scales the image the same way for hover, which is why the
+// two treatments agree.
+// `.reveal` is repeated in the selector DELIBERATELY.
+//
+// `.reveal.reveal--image:not(.is-revealed)` rather than `.reveal--image:not(.is-revealed)`. The
+// variant class is written by the directive, and if it were ever written while
+// the element was NOT armed — a reduced-motion user, a missing observer, a future
+// refactor — a bare `.reveal--image` selector would hide the image at opacity 0
+// with no rule that could bring it back. Requiring `.reveal` means the hidden
+// state is only ever reachable through the state that is also responsible for
+// un-hiding it, so the CSS cannot hide content on its own.
+//
+// This is the same reason the reduced-motion block above forces `.reveal`
+// visible: the rule that hides must be unreachable without the rule that shows.
+.reveal.reveal--image:not(.is-revealed) {
   opacity: 0;
   transform: scale(1.04);
+}
+
+// Image reveals run on `--duration-reveal-image` rather than `--duration-reveal`.
+//
+// Only the duration is overridden; the variant's easing and its hidden state are
+// shared with every other reveal, so there is still exactly one reveal mechanism.
+// The override is written after the `.reveal` shorthand on purpose — `transition`
+// is a shorthand and would otherwise reset `transition-duration` back to the
+// shared value.
+.reveal.reveal--image {
+  transition-duration: var(--duration-reveal-image);
 }
 
 // Staggered siblings, capped so a long list never feels slow.
@@ -77,29 +130,21 @@
 }
 
 // -----------------------------------------------------------------------------
-// Image reveal — a curtain wipe for editorial figures.
-//
-// Uses clip-path (compositor-friendly on modern engines) with a scale fallback.
-// -----------------------------------------------------------------------------
-@keyframes nova-curtain {
-  from {
-    clip-path: inset(0 0 100% 0);
-  }
-
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-.curtain {
-  animation: nova-curtain var(--duration-slow) var(--ease-out) both;
-}
-
-// -----------------------------------------------------------------------------
 // Header / mobile menu transitions.
 //
 // The menu panel is driven by a signal in `site-header` (M1). CSS only handles
 // the visual transition; state lives in the component.
+//
+// The keyframes are global but the *usage* is component-local: `site-header.scss`
+// applies them under `:host(.is-open)`, so the animation only fires when the
+// panel actually opens. The nav is always in the DOM, so an unconditional
+// animation would also fire on first paint.
+//
+// There is deliberately no transition on CLOSE. Closing sets `menuOpen` to false
+// immediately, which is what releases `inert`, returns focus to the trigger and
+// dismisses the panel; holding the panel around for the length of an exit
+// animation would mean a keyboard user's focus had already left a subtree that
+// was still on screen.
 // -----------------------------------------------------------------------------
 @keyframes nova-menu-in {
   from {
@@ -111,8 +156,4 @@
     opacity: 1;
     transform: translate3d(0, 0, 0);
   }
-}
-
-.menu-enter {
-  animation: nova-menu-in var(--duration-base) var(--ease-out) both;
 }

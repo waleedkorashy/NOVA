@@ -23,10 +23,16 @@
   order is not an argument. `role="list"` sits alongside `.list-reset` because
   stripping markers with CSS alone makes Safari and VoiceOver drop the list
   semantics entirely.
+
+  M8 motion. Heading, then the creed as one short list. The creed does NOT get a
+  stagger: it is three single-line statements in a narrow column, so a diagonal
+  wave would be visible on three short targets rather than on three tall blocks,
+  and the reader is scanning them for meaning rather than watching them arrive.
 -->
 <section id="about" class="section story" aria-labelledby="about-title">
   <div class="container">
     <ui-section-heading
+      novaReveal
       eyebrow="The Idea"
       title="The room is the real subject."
       lede="Furniture drawn in service of the space it stands in. The piece is the last decision, not the first."
@@ -35,21 +41,21 @@
 
     <div class="story__spread">
       <div class="prose story__prose">
-        <p>
+        <p novaReveal>
           Most furniture is designed to be looked at. This is designed to be lived around, which
           means the drawing starts with what is left over: the clearance beneath a seat, the wall a
           chair backs onto, the width of a walkway kept open. A piece is finished when the space
           around it still works, and that is a harder thing to draw than the piece itself.
         </p>
 
-        <p>
+        <p novaReveal>
           Everyday life is the only brief worth taking seriously. A sofa has to survive a Tuesday as
           well as a photograph. A surface has to take a cup ring, a scratch and a decade of daylight
           without turning into either a museum exhibit or a disposal problem. Anything that cannot
           do that has not been designed so much as styled.
         </p>
 
-        <p>
+        <p novaReveal>
           The name is the argument. A nova is the point at which a quantity of light suddenly
           becomes enough to see by — something that was always there, and only now is legible. A
           good room does the same thing. Nothing moves. A little of the right thing arrives in the
@@ -57,7 +63,7 @@
         </p>
       </div>
 
-      <ul class="list-reset story__creed" role="list">
+      <ul class="list-reset story__creed" role="list" novaReveal>
         <li class="story__creed-item">Quiet over impressive.</li>
         <li class="story__creed-item">Nothing added for effect.</li>
         <li class="story__creed-item">One collection, drawn as a set.</li>

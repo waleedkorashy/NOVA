@@ -25,10 +25,19 @@
 
   No links or buttons. Nothing here goes anywhere, so every focusable element added
   would be a tab stop that exists only to be skipped (WCAG 2.4.3).
+
+  M8 motion. The heading and the aside use the default settle. The photograph
+  uses the `image` variant, and it is placed on the `<img>` rather than on
+  `.editorial__frame`: the frame is the fixed-ratio box that reserves the space,
+  and scaling the frame would make the approved composition 4% larger for 600ms
+  and could push a full-bleed edge past the viewport. Scaling the image inside
+  the frame's `overflow: hidden` crops the oversize instead, so the frame's
+  dimensions never change at any point. See `_motion.scss`.
 -->
 <section id="journal" class="section editorial" aria-labelledby="editorial-title">
   <div class="container">
     <ui-section-heading
+      novaReveal
       eyebrow="Journal"
       title="The hours between things."
       lede="What a room is like when no one is performing in it — which is most of the time, and all of the design."
@@ -40,6 +49,7 @@
         <span class="figure editorial__frame">
           <img
             class="editorial__image"
+            novaReveal="image"
             [ngSrc]="image"
             ngSrcset="640w, 1200w"
             [sizes]="sizes"
@@ -59,7 +69,7 @@
         </figcaption>
       </figure>
 
-      <div class="editorial__aside">
+      <div class="editorial__aside" novaReveal>
         <!--
           A <blockquote> because it is a pull-quote, not an <em> inside a paragraph.
           No <cite>: the line is the brand's own position, and attributing it to a

@@ -71,6 +71,21 @@ $bp-nav: 60rem;
   font-family: var(--font-display);
   font-optical-sizing: auto;
 
+  // WCAG 2.5.8 (AA) requires a pointer target of at least 24x24 CSS px, but this
+  // link's own box is only 20px tall at the narrow end. The hit area is grown by
+  // a transparent, absolutely positioned ::after instead of by padding: padding
+  // would resize the box and reflow `.bar`, whereas a pseudo-element extends the
+  // region that dispatches clicks to this link with no layout effect whatsoever.
+  // The inset stays inside `.bar`'s 3.5rem min-block-size, and it cannot reach
+  // `.nav`, so no other control competes for the same pixels.
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+  }
+
   // 20px at 360, 24px from ~880 up. Capped at 24px to respect the 104px budget.
   font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
   font-weight: var(--weight-medium);
